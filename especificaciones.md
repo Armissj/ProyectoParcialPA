@@ -1,137 +1,343 @@
-# RAYAO\* - Cómo va a funcionar el sistema
+# RAYAO\* - Especificaciones del sistema
 
-**Versión:** 0.1 - catálogo e inventario  
+**Versión:** 0.2 - sistema de tienda con compras y ventas  
 **Fecha:** 24 de octubre de 2026  
 **Materia:** Programación Avanzada en C#  
 **Forma de trabajo:** Spec Driven Development (SDD)
 
-## 1. Qué queremos hacer
+La idea es administrar RAYAO*, una tienda de tecnología, gaming y música. Vamos a manejar productos, clientes, proveedores, usuarios, compras y ventas siguiendo la organización que usamos en clase. Las entidades tendrán atributos privados, constructores y propiedades públicas, respetando las reglas que restringen los cambios de código y stock.
 
-La idea es crear un programa para RAYAO*, una tienda que junta dos cosas que nos gustan: las PC y la música. Vamos a manejar periféricos, componentes de PC, equipos para hacer música y discos de vinilo.
+## 1. Arquitectura General
 
-En esta primera versión queremos llevar el inventario: saber qué productos hay, cuánto cuestan y cuántas unidades quedan. También vamos a poder agregar productos, buscarlos, cambiar sus datos y eliminarlos.
+- Lenguaje y Framework: C#, Windows Forms, .NET Framework 4.7.2
+- Organización: Entidades, Controladores y Formularios
+- Persistencia: Listas en memoria (los datos se perderán al cerrar el programa)
 
-Para empezar, vamos a trabajar con listas en memoria, como en la práctica de clase. Eso significa que los datos estarán disponibles mientras el programa esté abierto y se perderán al cerrarlo. Cada vez que lo abramos, la lista empezará vacía.
+La clase base es `Producto`, que es abstracta. Las familias y sus clases concretas quedan así:
 
-## 2. Quién lo va a usar
-
-Lo va a usar la persona encargada de la tienda. Desde las ventanas del programa podrá revisar y administrar los productos. Por ahora vamos a trabajar con un solo tipo de usuario.
-
-## 3. Qué productos vamos a manejar
-
-| Categoría | Qué podemos poner aquí |
+| Familia | Clases concretas |
 |---|---|
-| Periféricos PC | Teclados, mouse y audífonos para PC. |
-| Componentes PC | Memorias RAM, SSD y tarjetas gráficas. |
-| Equipo musical | Micrófonos, interfaces de audio, controladores MIDI y monitores de estudio. |
-| Vinilos | Discos con el nombre del álbum y del artista. |
+| PerifericoPC | Teclado, Mouse, MonitorPC |
+| ComponentePC | Procesador, MemoriaRAM, TarjetaGrafica |
+| EquipoMusical | Microfono, InterfazAudio |
+| PerifericoConsola | PerifericoPS5, PerifericoSwitch |
+| Producto | Vinilo, ProductoGaming |
 
-En los vinilos podemos incluir distintos artistas y géneros. Los productos que ingresemos para mostrar cómo funciona el programa serán ejemplos de prueba.
+Las cuatro familias intermedias también son abstractas. Los apartados de PS5 y Switch se muestran por separado. `ProductoGaming` reúne consolas, videojuegos y accesorios; `EsRetro` permite identificar los artículos retro.
 
-## 4. Qué datos tendrá cada producto
+## 2. Entidades
 
-| Dato | Qué vamos a guardar | Qué debemos revisar |
+### Producto (abstracta)
+
+- Atributos: código (único, en mayúsculas, sin espacios sobrantes), nombre, precio (máx. dos decimales), stock
+- Propiedades: públicas para cada atributo
+- Constructores: por defecto y parametrizado
+
+### PerifericoPC (abstracta, hereda de Producto)
+
+- marca
+
+### Teclado (hereda de PerifericoPC)
+
+- tipo (mecánico, membrana, etc.)
+
+### Mouse (hereda de PerifericoPC)
+
+- DPI
+
+### MonitorPC (hereda de PerifericoPC)
+
+- pulgadas, Hz
+
+### ComponentePC (abstracta, hereda de Producto)
+
+- marca
+
+### Procesador (hereda de ComponentePC)
+
+- socket, núcleos
+
+### MemoriaRAM (hereda de ComponentePC)
+
+- capacidad, tipo
+
+### TarjetaGrafica (hereda de ComponentePC)
+
+- memoria, chipset
+
+### EquipoMusical (abstracta, hereda de Producto)
+
+- marca
+
+### Microfono (hereda de EquipoMusical)
+
+- tipo (condensador, dinámico, etc.)
+
+### InterfazAudio (hereda de EquipoMusical)
+
+- entradas, salidas
+
+### Vinilo (hereda de Producto)
+
+- artista, género, año
+
+### PerifericoConsola (abstracta, hereda de Producto)
+
+- marca, tipoAccesorio, compatibilidad
+
+### PerifericoPS5 (hereda de PerifericoConsola)
+
+Usa los datos comunes de PerifericoConsola y representa los accesorios compatibles con PS5.
+
+### PerifericoSwitch (hereda de PerifericoConsola)
+
+Usa los datos comunes de PerifericoConsola y representa los accesorios compatibles con Nintendo Switch.
+
+### ProductoGaming (hereda de Producto)
+
+- marca, plataforma, tipoArticulo (consola, videojuego, accesorio), esRetro
+
+### Usuario
+
+- id, nombreUsuario, contraseña (almacenada protegida, no en texto plano), rol (Administrador/Vendedor)
+- Propiedades públicas, constructores
+
+### Cuentas de prueba iniciales
+
+| Rol | Usuario | Contraseña de demostración |
 |---|---|---|
-| Código | Un texto para identificar el producto. | Es obligatorio y no se puede repetir. Quitaremos los espacios del inicio y del final y lo guardaremos en mayúsculas. Una vez registrado, el código se queda igual. |
-| Nombre | El nombre del producto o del álbum, si es un vinilo. | No puede quedar vacío. |
-| Categoría | Una de las cuatro categorías de la tienda. | Hay que seleccionar una. |
-| Marca | La marca del periférico, componente o equipo musical. | Es obligatoria en esas tres categorías. |
-| Artista | El nombre del artista del vinilo. | Es obligatorio cuando el producto es un vinilo. |
-| Precio | Lo que cuesta una unidad, en dólares. | Tiene que ser mayor que cero y tener máximo dos decimales. Usaremos decimal. |
-| Stock | Cuántas unidades tenemos. | Tiene que ser un número entero, desde cero en adelante. |
+| Administrador | admin | `Admin123*` |
+| Vendedor | vendedor | `Vendedor123*` |
 
-Antes de guardar, quitaremos los espacios que sobren al inicio y al final de los textos. Escribir solo espacios cuenta como dejar el dato vacío. Si registramos un vinilo, la Marca quedará vacía. En las otras categorías, el Artista quedará vacío.
+### Cliente
 
-## 5. Qué tiene que hacer el programa
+- id, nombre, apellido, dirección, teléfono, email
 
-### RF01. Agregar un producto
+### Proveedor
 
-Abrimos el formulario, llenamos los datos y damos clic en Aceptar. Si todo está bien, el producto se agrega a la lista y aparece en la tabla. Si falta algo o hay un dato incorrecto, el programa nos dice qué debemos corregir y no lo guarda.
+- id, nombre, contacto, teléfono, email
 
-### RF02. Ver los productos
+### Compra
 
-En la ventana principal vamos a tener una tabla, usando DataGridView, con estas columnas: Código, Nombre, Categoría, Marca, Artista, Precio y Stock. Los precios se mostrarán con dos decimales.
+- id, fecha, proveedor, usuario, lista de DetalleCompra
 
-Si todavía no hemos registrado nada, la tabla estará vacía y aparecerá un mensaje indicando que no hay productos.
+### DetalleCompra
 
-### RF03. Buscar un producto
+- producto, cantidad, costoUnitario
 
-Vamos a poder buscar por el código completo, por una parte del nombre o por una parte del nombre del artista. Tiene que funcionar igual si escribimos con mayúsculas o minúsculas. También se quitarán los espacios que sobren al inicio y al final de la búsqueda.
+### Venta
 
-Si dejamos la búsqueda vacía, se mostrarán todos los productos de la categoría que tengamos seleccionada. Si no se encuentra nada, la tabla quedará vacía y el programa nos avisará.
+- id, fecha, cliente, usuario, lista de DetalleVenta
 
-### RF04. Cambiar los datos de un producto
+### DetalleVenta
 
-Primero seleccionamos el producto. Al abrir el formulario, sus datos ya tienen que estar cargados. Podemos cambiar el nombre, la categoría, la marca, el artista, el precio y el stock. El código se verá en pantalla, pero no se podrá editar.
+- producto, cantidad, precioUnitario
 
-Al aceptar, se actualiza ese mismo producto y se revisan las mismas reglas que al registrarlo. Si cambiamos la categoría, se pedirá Marca o Artista según corresponda y se dejará vacío el campo que ya no aplique. Si damos en Cancelar, se cerrará la ventana y el producto quedará como estaba.
+## 3. Controladores
 
-### RF05. Eliminar un producto
+- TListaProducto: List<Producto>, métodos estáticos para CRUD, búsquedas, filtros, resumen, validaciones.
+- TListaUsuario: List<Usuario>, métodos para CRUD, autenticación, comprobación de permisos.
+- TListaCliente: List<Cliente>, métodos para CRUD y búsquedas.
+- TListaProveedor: List<Proveedor>, métodos para CRUD y búsquedas.
+- TListaCompra: List<Compra>, métodos para registrar, consultar y filtrar compras. Controla duplicados y confirma operaciones.
+- TListaVenta: List<Venta>, métodos para registrar, consultar y filtrar ventas. Controla duplicados y confirma operaciones.
 
-Seleccionamos el producto y damos clic en Eliminar. Antes de borrarlo, el programa nos preguntará si estamos seguros. Si aceptamos, se elimina solo ese producto y se actualiza la tabla. Si cancelamos, todo queda igual.
+## 4. Formularios
 
-### RF06. Mostrar productos por categoría
+### frmLogin
 
-Vamos a poder escoger una categoría o la opción Todas. Por ejemplo, al escoger Vinilos se mostrarán solo los discos.
+- Controles: TextBox usuario, TextBox contraseña (oculta), botón Entrar, botón Salir.
+- Función: Validar usuario y contraseña, permitir acceso según rol. Permite cerrar sesión.
 
-La categoría también se aplicará cuando hagamos una búsqueda. Si tenemos seleccionado Vinilos y buscamos un artista, se mostrarán los vinilos que coincidan. Con Todas, la búsqueda se hará entre los productos de cualquier categoría.
+### frmAdmin (principal)
 
-### RF07. Ver un resumen del inventario
+- Controles:
+- Tabla de inventario (DataGridView)
+- Búsqueda y filtros
+- Resumen general (no cambia por filtros)
+- Botones para gestionar productos
+- Acceso a los otros módulos según permisos
+- Botón para cerrar sesión
+- Función: Acceso a módulos, muestra resumen general, permite cerrar sesión.
 
-En la ventana principal vamos a mostrar cuántos productos distintos tenemos registrados, cuántas unidades hay en total y cuánto vale todo el inventario.
+### frmUsuarios (solo administrador)
 
-Para sacar ese valor, multiplicamos el precio por el stock de cada producto y sumamos los resultados. El resumen siempre será de todo el inventario, aunque estemos viendo una búsqueda o una sola categoría. Se actualizará al agregar, modificar o eliminar. Si la lista está vacía, los tres valores serán cero.
+- Controles: DataGridView de usuarios, botones Agregar, Editar, Eliminar, Buscar, Salir.
+- Función: CRUD de usuarios.
 
-## 6. Reglas que vamos a tener en cuenta
+### frmClientes
 
-- No se puede repetir un código. Por ejemplo, PC001 y pc001 se tomarán como el mismo código.
-- Si hay un error en los datos, no se cambia lo que ya estaba guardado.
-- Para modificar o eliminar, primero hay que seleccionar un producto. Si no lo hacemos, el programa nos avisa y no cambia nada.
-- Si damos en Cancelar al registrar o editar, no se guardan los cambios.
-- Los mensajes tienen que explicar qué dato falta o qué está mal.
-- Después de guardar un cambio, la tabla y el resumen se actualizan. La búsqueda y la categoría que teníamos seleccionadas se mantienen.
+- Controles: DataGridView de clientes, botones Agregar, Editar, Eliminar, Buscar, Salir.
+- Función: CRUD de clientes.
 
-## 7. Cómo vamos a organizar el código
+### frmProveedores
 
-Vamos a usar C#, Windows Forms y .NET Framework 4.7.2. Lo organizaremos como el trabajo de clase, con Entidades, Controladores y Formularios.
+- Controles: DataGridView de proveedores, botones Agregar, Editar, Eliminar, Buscar, Salir.
+- Función: CRUD de proveedores.
 
-| Carpeta | Clase o formulario | Para qué lo vamos a usar |
-|---|---|---|
-| Entidades | Producto | Para guardar los datos del producto, con sus atributos, constructores y propiedades. |
-| Controladores | TListaProducto | Para manejar List<Producto>, revisar que los códigos no se repitan y hacer las operaciones de agregar, modificar, eliminar, buscar y consultar. |
-| Formularios | frmAdmin | Será la ventana principal, donde veremos la tabla, la búsqueda, las categorías, el resumen y los botones. |
-| Formularios | frmProducto | Será la ventana para registrar o editar. Aquí llenaremos los datos y tendremos Aceptar y Cancelar. |
+### frmProducto
 
-Seguiremos usando nombres como TListaProducto, CrearObjeto() y Listar(), igual que en clase. Para consultar las listas podemos usar LINQ.
+- Controles: ComboBox tipo de producto, campos dinámicos según tipo, botones Guardar, Cancelar.
+- Función: Alta y edición de productos, validaciones, muestra solo campos relevantes. El stock se muestra como dato de consulta. Solo los productos nuevos empiezan en cero; al editar se conserva el stock actual, sin permitir cambiarlo desde este formulario.
 
-El nombre de la tienda es RAYAO*. En los archivos y las clases usaremos Rayao, sin el asterisco.
+### frmCompra
 
-## 8. Cómo vamos a comprobar que funciona
+- Controles: ComboBox proveedor, DataGridView para productos de la compra (producto, cantidad, costo), botón Agregar producto, botón Confirmar, botón Cancelar.
+- Función: Registrar compras, sumar productos, validar cantidades y costos, confirmar o cancelar operación. El stock solo cambia al confirmar.
 
-Estas son las pruebas que vamos a hacer cuando el programa esté creado. Aquí dejamos escrito qué esperamos que pase; después registraremos los resultados y las evidencias.
+### frmVenta
 
-| Prueba | Función | Qué vamos a revisar |
-|---|---|---|
-| CA01 | RF01, RF02 | Agregar PC001, Teclado mecánico, Periféricos PC, una marca, precio 25.50 y stock 5. Tiene que guardarse un producto y aparecer en la tabla. |
-| CA02 | RF01 | Intentar agregar pc001 cuando ya existe PC001. Tiene que avisar que el código está repetido y dejar la lista igual. |
-| CA03 | RF01, RF04 | Dejar un dato obligatorio vacío o escribir solo espacios. Tiene que pedir que lo completemos y no guardar el cambio. |
-| CA04 | RF01, RF04 | Poner stock negativo o con decimales. No tiene que permitir guardarlo. |
-| CA05 | RF01, RF04 | Poner precio cero, negativo o con más de dos decimales. Tiene que pedir un precio válido. |
-| CA06 | RF01, RF04 | Intentar guardar un vinilo sin Artista, o un periférico, componente o equipo musical sin Marca. Tiene que pedir el dato que falta. |
-| CA07 | RF03, RF06 | Buscar tecla y escoger Periféricos PC. Tienen que salir solo los periféricos cuyo nombre contenga ese texto, sin importar las mayúsculas. También probaremos que buscar un artista encuentre sus vinilos. |
-| CA08 | RF04 | Cambiar el precio y el stock de PC001. Tiene que actualizarse el mismo producto, conservar su código y mantenerse la cantidad de productos registrados. |
-| CA09 | RF01, RF04 | Llenar datos y dar en Cancelar. El inventario tiene que quedar como estaba antes de abrir el formulario. |
-| CA10 | RF05 | Intentar eliminar un producto y cancelar. Tiene que seguir en la lista. Si repetimos la operación y confirmamos, tiene que borrarse solo ese producto. |
-| CA11 | RF04, RF05 | Dar en Modificar o Eliminar sin seleccionar nada. Tiene que aparecer un aviso y no cambiar la lista. |
-| CA12 | RF03, RF06 | Dejar vacía la búsqueda y escoger Vinilos. Tienen que aparecer todos los vinilos. Al escoger Todas, tiene que aparecer el inventario completo. |
-| CA13 | RF07 | Tener un producto de 25.50 con stock 5 y otro de 10.00 con stock 2. El resumen tiene que indicar 2 productos, 7 unidades y 147.50 dólares. Cambiar el filtro no debe cambiar ese resumen general. |
-| CA14 | RF02, RF03, RF07 | Abrir el programa con la lista vacía o buscar algo que no existe. La tabla tiene que quedar vacía. El resumen será cero solo si no hay ningún producto en todo el inventario. |
-| CA15 | RF04 | Cambiar un producto de Equipo musical a Vinilos. Tiene que pedir Artista y dejar Marca vacía. Si cancelamos, tienen que mantenerse la categoría y los datos que tenía antes. |
+- Controles: ComboBox cliente, DataGridView para productos de la venta (producto, cantidad, precio), botón Agregar producto, botón Confirmar, botón Cancelar, muestra total y comprobante.
+- Función: Registrar ventas, sumar productos, validar stock y precios, confirmar o cancelar operación. El stock solo cambia al confirmar.
+
+### frmReportes
+
+- Controles: Filtros por fechas, tipo de reporte (compras, ventas, inventario), DataGridView para mostrar resultados, botón Exportar/Imprimir, botón Salir.
+- Función: Consultar y filtrar compras, ventas e inventario.
+
+## 5. Reglas y Validaciones
+
+- El código de producto debe ser único, en mayúsculas y sin espacios sobrantes.
+- La búsqueda de productos no distingue mayúsculas/minúsculas.
+- Precios y costos con máximo dos decimales, mayores a cero.
+- El stock de productos nuevos inicia en cero y solo cambia con compras/ventas confirmadas.
+- No se puede vender más unidades de las disponibles.
+- Cantidades deben ser enteras y positivas.
+- El costo de compra y el precio de venta son datos distintos.
+- El stock solo cambia al confirmar una compra o venta completa.
+- Antes de confirmar se valida toda la operación. Si se cancela o hay un error en cualquier línea, no se registra la compra o venta ni se modifica ningún stock.
+- Si se agrega varias veces el mismo producto en una compra/venta, se suman las cantidades antes de confirmar.
+- Evitar doble registro de compras/ventas: deshabilitar botón Confirmar tras primer clic y controlar en el controlador.
+- Registrar el usuario que realiza cada operación.
+- Las compras y ventas confirmadas conservan los nombres, cantidades y precios originales aunque después se edite el producto.
+- Para productos, clientes, proveedores y usuarios con movimientos registrados, solo se pueden desactivar (no eliminar físicamente). Los desactivados no aparecen en altas nuevas ni en búsquedas normales.
+- Al editar un producto y cambiar su tipo, se validan y limpian los campos específicos. Si el producto tiene movimientos registrados, no se permite cambiar el tipo.
+- El resumen general del inventario muestra totales y no cambia al aplicar filtros.
+- Los datos se mantienen solo en memoria; al cerrar el programa se pierden todos los registros. Cerrar sesión conserva las listas mientras el programa siga abierto.
+- Código y nombre son obligatorios. Quitamos los espacios del inicio y del final de los textos; escribir solo espacios cuenta como dejar el campo vacío.
+- El código se guarda en mayúsculas y no cambia después del registro. PC001 y pc001 se consideran el mismo código, sin importar el tipo de producto.
+- Buscamos por código completo o por una parte del nombre o del artista. La búsqueda se combina con los filtros; si está vacía, muestra todos los productos que cumplan los filtros seleccionados.
+- El resumen general indica productos activos distintos, unidades disponibles y valor del inventario a precio de venta: suma de precio por stock. Con inventario vacío, los tres valores son cero.
+- Si cancelamos una edición o falla una validación, el producto queda como estaba. Después de un cambio se actualizan tabla y resumen, manteniendo la búsqueda y los filtros.
+
+## 6. Permisos por Rol
+
+### Administrador
+
+- Acceso total a todos los módulos: productos, usuarios, clientes, proveedores, compras, ventas, reportes.
+- Puede agregar, editar y eliminar/desactivar usuarios, productos, clientes y proveedores.
+- Puede consultar todo el inventario y modificar los datos permitidos de los productos. El stock cambia mediante compras y ventas confirmadas.
+
+### Vendedor
+
+- Puede consultar productos, administrar clientes, consultar proveedores, registrar compras y ventas, consultar reportes.
+- No puede modificar productos, proveedores ni usuarios.
+- Los permisos se comprueban tanto en la interfaz como en los controladores.
+
+## 7. Pruebas y Resultados Esperados
+
+### Pruebas de acceso y roles
+
+- Entrar como admin (admin/Admin123*) permite acceso total.
+- Entrar como vendedor (vendedor/Vendedor123*) impide gestionar usuarios y modificar productos o proveedores. Sí permite consultar proveedores y usar las demás funciones autorizadas.
+- Intentar acceder a un módulo sin permiso muestra mensaje y no permite la acción.
+
+### Pruebas de productos y stock
+
+- Crear producto "MON001", stock inicial 0.
+- Comprar 5 unidades: stock queda en 5.
+- Vender 2 unidades: stock queda en 3.
+- Intentar vender 4 unidades: operación rechazada, stock sigue en 3.
+- Cancelar una compra o venta: stock no cambia.
+- Editar producto con movimientos: no se puede cambiar su tipo. Los cambios permitidos conservan el código, el stock actual y el historial.
+- Eliminar producto con movimientos: solo se desactiva, no se elimina.
+
+### Pruebas de compras y ventas
+
+- Registrar compra con varios productos y cantidades, confirmar: stock aumenta correctamente.
+- Registrar venta con varios productos y cantidades, confirmar: stock disminuye correctamente.
+- Agregar dos veces el mismo producto en una compra suma cantidades antes de confirmar.
+- Intentar confirmar dos veces la misma operación: solo se registra una vez.
+- Cancelar operación: no cambia nada.
+
+### Pruebas de clientes y proveedores
+
+- Alta, baja, modificación y búsqueda de clientes y proveedores.
+- Eliminar cliente/proveedor con movimientos: solo se desactiva.
+
+### Pruebas de reportes
+
+- Consultar compras, ventas e inventario.
+- Filtrar por fechas y tipos de producto.
+- Ver totales y comprobantes.
+
+### Pruebas de sesión y persistencia
+
+- Permite cerrar sesión y volver a frmLogin.
+- Al cerrar el programa, todos los datos se pierden.
+
+## 8. Orden de desarrollo por etapas (con pruebas en cada una)
+
+### 1. Diseño de entidades y controladores
+
+- Crear jerarquía de productos, Usuario, Cliente, Proveedor, Compra, DetalleCompra, Venta, DetalleVenta
+- Controladores para cada entidad
+- Pruebas: crear, buscar, modificar y desactivar entidades en memoria
+
+### 2. frmLogin y control de acceso
+
+- Validación de usuario y contraseña, roles, cierre de sesión
+- Pruebas: acceso con cuentas de prueba, restricciones por rol
+
+### 3. frmAdmin
+
+- Tabla de inventario, búsqueda, filtros, resumen, botones de gestión
+- Pruebas: visualizar inventario, aplicar filtros, ver resumen
+
+### 4. frmUsuarios (solo admin)
+
+- CRUD de usuarios, desactivación
+- Pruebas: agregar, editar, desactivar usuarios, comprobar permisos
+
+### 5. frmProducto y TListaProducto
+
+- Alta, baja, modificación, validaciones, stock solo por compras/ventas
+- Pruebas: crear producto, editar, desactivar, cambiar tipo, validar reglas
+
+### 6. frmClientes y frmProveedores
+
+- CRUD completo, desactivación
+- Pruebas: agregar, editar, desactivar, comprobar restricciones
+
+### 7. frmCompra
+
+- Registrar compras, sumar productos, validar cantidades y costos, confirmar/cancelar
+- Pruebas: stock, duplicados, cancelaciones, validaciones
+
+### 8. frmVenta
+
+- Registrar ventas, validar stock, confirmar/cancelar
+- Pruebas: stock, duplicados, cancelaciones, validaciones
+
+### 9. frmReportes
+
+- Consultas y filtros
+- Pruebas: reportes por fechas, totales, comprobantes
+
+### 10. Pruebas integrales y validaciones finales
+
+### 11. Personalización visual (logo, fondos, iconos)
+
+**Nota:**
+
+Durante el desarrollo, realizar las pruebas indicadas en cada etapa para asegurar el cumplimiento de las reglas y el correcto funcionamiento del sistema.
 
 ## 9. Cómo vamos a trabajar con SDD
 
-Primero dejamos escrito lo que queremos que haga el sistema en este archivo. Con eso vamos a preparar el plan técnico, repartir las tareas y pedirle a la IA que genere el código siguiendo estas indicaciones.
+Primero dejamos estas especificaciones en el repositorio. Después preparamos el plan técnico con archivos, responsabilidades, métodos, controles y tareas por etapa. Con ese plan pediremos a Copilot que genere el código por partes.
 
-Después vamos a ejecutar el programa y hacer las pruebas de arriba para ver si cumple lo que pedimos. Si queremos cambiar alguna función, primero actualizamos lo que está escrito y luego cambiamos el programa.
+En cada etapa revisaremos el código y ejecutaremos sus pruebas. Los casos de este documento indican lo que esperamos; todavía no son resultados ejecutados. Guardaremos las evidencias cuando exista el programa.
 
-Este documento irá en la rama documentacion-sdd. Vamos a guardar el cambio con un commit y abrir un Pull Request para revisarlo antes de pasarlo a main y seguir con la implementación.
+Los cambios se trabajarán en ramas y se revisarán con Pull Requests antes de integrarlos a main. También prepararemos un flujo de GitHub Actions para compilar y ejecutar las pruebas automáticas.
+
+Si cambia una función, primero actualizamos las especificaciones y el plan. Los fondos, iconos y demás recursos visuales se prepararán con el estilo de RAYAO* cuando tengamos definidas las pantallas.
