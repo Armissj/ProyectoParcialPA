@@ -48,11 +48,11 @@ Nota de ajuste planificado:
 
 ### 4.1 Rutas del repositorio y de la solución
 
-Estas rutas son relativas a la raíz del repositorio de Git, donde están README.md, especificaciones.md y este plan. Se conserva la solución existente .slnx.
+Estas rutas son relativas a la raíz del repositorio de Git, donde están README.md, especificaciones.md y este plan. Se conserva la solución existente .slnx en la raíz del repositorio.
 
 | Elemento | Ruta desde la raíz del repositorio |
 |---|---|
-| Solución existente | `ProyectoParcialPA/ProyectoParcialPA.slnx` |
+| Solución existente | `ProyectoParcialPA.slnx` |
 | Proyecto principal | `ProyectoParcialPA/ProyectoParcialPA/ProyectoParcialPA.csproj` |
 | Arranque principal | `ProyectoParcialPA/ProyectoParcialPA/Program.cs` |
 | Nuevo proyecto de pruebas | `ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj` |
@@ -872,9 +872,9 @@ El workflow .github/workflows/ci.yml se incorporará cuando el primer conjunto d
 Ejecutar desde la raíz del repositorio, usando Debug al compilar y al ejecutar las pruebas:
 
 ```powershell
-msbuild "ProyectoParcialPA\ProyectoParcialPA.slnx" /t:Restore /p:RestorePackagesConfig=true
-msbuild "ProyectoParcialPA\ProyectoParcialPA.slnx" /t:Build /p:Configuration=Debug
-dotnet test "ProyectoParcialPA\ProyectoParcialPA.Tests\ProyectoParcialPA.Tests.csproj" --configuration Debug --no-build --no-restore --logger "trx;LogFileName=test-results.trx" --results-directory "TestResults"
+msbuild "ProyectoParcialPA.slnx" /t:Restore /p:RestorePackagesConfig=true
+msbuild "ProyectoParcialPA.slnx" /t:Build /p:Configuration=Debug
+dotnet test "ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj" --configuration Debug --no-build --no-restore --logger "trx;LogFileName=test-results.trx" --results-directory "TestResults"
 ```
 
 MSBuild restaura y compila la solución existente. dotnet test ejecuta las pruebas ya compiladas con VSTest. Si las rutas reales cambian, se actualizan tanto en el plan como en el workflow.
