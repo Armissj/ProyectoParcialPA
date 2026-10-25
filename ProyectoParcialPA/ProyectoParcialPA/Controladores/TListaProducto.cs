@@ -9,7 +9,7 @@ namespace ProyectoParcialPA.Controladores
     {
         private static readonly object LockObject = EstadoTienda.Sincronizacion;
         private static List<Producto> _productos;
-        private static readonly HashSet<string> ProductosConMovimientos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        private static HashSet<string> ProductosConMovimientos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         private static void InicializarSiNecesario()
         {
@@ -57,6 +57,35 @@ namespace ProyectoParcialPA.Controladores
             lock (LockObject)
             {
                 return ProductosConMovimientos.Contains(codigo.Trim());
+            }
+        }
+
+        // Solo los controladores de compras y ventas confirman variaciones.
+        // Se preparan todas las copias antes de publicar el nuevo inventario.
+        internal static bool AplicarVariacionesStock(IDictionary<string, int> variaciones, out string mensaje)
+        {
+            mensaje = "";
+            if (variaciones == null || variaciones.Count == 0) { mensaje = "La operación no tiene productos."; return false; }
+            lock (LockObject)
+            {
+                InicializarSiNecesario();
+                var nuevos = _productos.Select(ClonarProducto).ToList();
+                var movimientos = new HashSet<string>(ProductosConMovimientos, StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    foreach (var cambio in variaciones)
+                    {
+                        string codigo = NormalizarCodigo(cambio.Key);
+                        var producto = nuevos.FirstOrDefault(p => p.Activo && p.Codigo == codigo);
+                        if (producto == null || cambio.Value == 0) { mensaje = "El producto no existe o está inactivo."; return false; }
+                        int stock = checked(producto.Stock + cambio.Value);
+                        if (stock < 0) { mensaje = "Stock insuficiente para " + producto.Nombre + "."; return false; }
+                        producto.EstablecerStockInterno(stock); movimientos.Add(codigo);
+                    }
+                }
+                catch (OverflowException) { mensaje = "La cantidad supera el límite del inventario."; return false; }
+                _productos = nuevos; ProductosConMovimientos = movimientos;
+                return true;
             }
         }
 
@@ -389,7 +418,7 @@ namespace ProyectoParcialPA.Controladores
                 return new ResumenInventario
                 {
                     CantidadProductos = activos.Count,
-                    UnidadesTotales = activos.Sum(p => p.Stock),
+                    UnidadesTotales = activos.Sum(p => (long)p.Stock),
                     ValorTotal = activos.Sum(p => p.Precio * p.Stock)
                 };
             }

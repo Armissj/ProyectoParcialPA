@@ -111,4 +111,12 @@
     <Compile Include="Entidades\Proveedor.cs" />
     <Compile Include="Utilidades\ReglasDatos.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controladores\TListaCompra.cs" />
+    <Compile Include="Controladores\TListaVenta.cs" />
+    <Compile Include="Entidades\Compra.cs" />
+    <Compile Include="Entidades\DetalleCompra.cs" />
+    <Compile Include="Entidades\DetalleVenta.cs" />
+    <Compile Include="Entidades\Venta.cs" />
+  </ItemGroup>
 </Project>
