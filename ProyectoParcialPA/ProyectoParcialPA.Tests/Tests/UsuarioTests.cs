@@ -200,7 +200,7 @@ namespace ProyectoParcialPA.Tests
         [TestMethod]
         public void PermisosSegunRolYSesionActual()
         {
-            var admin = TListaUsuario.Login("admin", "Admin123*");
+            Assert.IsNotNull(TListaUsuario.Login("admin", "Admin123*"));
             Assert.IsTrue(TListaUsuario.TienePermiso("AgregarUsuario"));
             Assert.IsTrue(TListaUsuario.TienePermiso("ActualizarUsuario"));
             Assert.IsTrue(TListaUsuario.TienePermiso("RegistrarCompra"));
@@ -210,7 +210,7 @@ namespace ProyectoParcialPA.Tests
             TListaUsuario.CerrarSesion();
             Assert.IsFalse(TListaUsuario.TienePermiso("AgregarUsuario"));
 
-            var vendedor = TListaUsuario.Login("vendedor", "Vendedor123*");
+            Assert.IsNotNull(TListaUsuario.Login("vendedor", "Vendedor123*"));
             Assert.IsTrue(TListaUsuario.TienePermiso("ConsultarProductos"));
             Assert.IsTrue(TListaUsuario.TienePermiso("RegistrarCompra"));
             Assert.IsTrue(TListaUsuario.TienePermiso("RegistrarVenta"));
