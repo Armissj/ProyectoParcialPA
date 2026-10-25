@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -187,11 +187,12 @@ namespace ProyectoParcialPA.Tests
             var mouse = new Mouse("MS070", "Mouse", 10.00m, "Razer", 15000);
 
             var campoStock = typeof(Producto).GetField("_stock", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            campoStock.SetValue(teclado, 5);
-            campoStock.SetValue(mouse, 2);
 
             TListaProducto.AgregarProducto(teclado, out _);
             TListaProducto.AgregarProducto(mouse, out _);
+            var internos = (System.Collections.IList)typeof(TListaProducto).GetField("_productos", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic).GetValue(null);
+            campoStock.SetValue(internos[0], 5);
+            campoStock.SetValue(internos[1], 2);
 
             var resumen = TListaProducto.ObtenerResumenGeneral();
             Assert.AreEqual(2, resumen.CantidadProductos);
@@ -225,6 +226,66 @@ namespace ProyectoParcialPA.Tests
             var sinMovimiento = new Teclado("PC090", "Teclado 2", 100m, "Logitech", "Mecánico");
             TListaProducto.AgregarProducto(sinMovimiento, out _);
             Assert.IsTrue(TListaProducto.ActualizarProducto("PC090", new Mouse("PC090", "Mouse 2", 50m, "Razer", 4000), out mensaje));
+        }
+
+        [TestMethod]
+        public void CambioDeTipoGuardaRealmenteElNuevoObjetoYCampos()
+        {
+            IniciarComoAdmin(); string mensaje;
+            Assert.IsTrue(TListaProducto.AgregarProducto(new Teclado("TIPO01", "Inicial", 10m, "Marca", "Mecánico"), out mensaje));
+            Assert.IsTrue(TListaProducto.ActualizarProducto("TIPO01", new Mouse("TIPO01", "Mouse nuevo", 25m, "Nueva marca", 6400), out mensaje));
+            var guardado = TListaProducto.BuscarPorCodigo("TIPO01") as Mouse;
+            Assert.IsNotNull(guardado);
+            Assert.AreEqual(6400, guardado.Dpi);
+            Assert.AreEqual("Mouse nuevo", guardado.Nombre);
+            Assert.AreEqual("Nueva marca", guardado.Marca);
+            Assert.AreEqual(25m, guardado.Precio);
+        }
+
+        [TestMethod]
+        public void CerrarSesionImpideConsultarInventarioPreviamenteCargado()
+        {
+            IniciarComoAdmin(); string mensaje;
+            TListaProducto.AgregarProducto(new Teclado("PRIV01", "Privado", 10m, "Marca", "Mecánico"), out mensaje);
+            SesionActual.CerrarSesion();
+            Assert.AreEqual(0, TListaProducto.ObtenerTodos().Count);
+            Assert.AreEqual(0, TListaProducto.ObtenerTodosInactivos().Count);
+            Assert.IsNull(TListaProducto.BuscarPorCodigo("PRIV01"));
+            Assert.AreEqual(0, TListaProducto.BuscarPorTexto("Privado").Count);
+            Assert.AreEqual(0, TListaProducto.FiltrarPorTipo("Teclado").Count);
+            Assert.AreEqual(0, TListaProducto.ObtenerResumenGeneral().CantidadProductos);
+            Assert.AreEqual(0m, TListaProducto.ObtenerValorInventarioVenta());
+            Assert.IsFalse(TListaProducto.ValidarStockDisponible("PRIV01", 1));
+        }
+
+        [TestMethod]
+        public void AltaSiempreEmpiezaEnCeroAunqueLaCopiaEntranteTengaStock()
+        {
+            IniciarComoAdmin(); string mensaje;
+            var producto = new Mouse("STOCK01", "Mouse", 10m, "Marca", 1000);
+            typeof(Producto).GetField("_stock", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(producto, 7);
+            Assert.IsTrue(TListaProducto.AgregarProducto(producto, out mensaje));
+            Assert.AreEqual(0, TListaProducto.BuscarPorCodigo("STOCK01").Stock);
+        }
+
+        [TestMethod]
+        public void CodigoDeProductoInactivoTampocoPuedeReutilizarse()
+        {
+            IniciarComoAdmin(); string mensaje;
+            TListaProducto.AgregarProducto(new Mouse("UNICO01", "Mouse", 10m, "Marca", 1000), out mensaje);
+            TListaProducto.DesactivarProducto("UNICO01", out mensaje);
+            Assert.IsFalse(TListaProducto.AgregarProducto(new Vinilo(" unico01 ", "Disco", 12m, "Artista", "Rap", 2000), out mensaje));
+        }
+
+        [TestMethod]
+        public void CopiasDeEntradaYListadosNoCambianElProductoGuardado()
+        {
+            IniciarComoAdmin(); string mensaje;
+            var producto = new Mouse("COPIA01", "Original", 10m, "Marca", 1000);
+            TListaProducto.AgregarProducto(producto, out mensaje); producto.Nombre = "Externo";
+            var copia = (Mouse)TListaProducto.ObtenerTodos()[0]; copia.Dpi = 999; copia.Activo = false;
+            var actual = (Mouse)TListaProducto.BuscarPorCodigo("COPIA01");
+            Assert.AreEqual("Original", actual.Nombre); Assert.AreEqual(1000, actual.Dpi); Assert.IsTrue(actual.Activo);
         }
     }
 }

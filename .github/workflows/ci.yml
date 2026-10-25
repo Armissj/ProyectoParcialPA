@@ -1,4 +1,4 @@
-name: RAYAO* CI
+﻿name: RAYAO* CI
 
 on:
   push:
@@ -16,6 +16,7 @@ jobs:
   build-and-test:
     name: Build and test
     runs-on: windows-latest
+    timeout-minutes: 20
 
     env:
       SOLUTION_PATH: ProyectoParcialPA.slnx
@@ -25,13 +26,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8.0.x'
 
@@ -88,10 +89,10 @@ jobs:
 
       - name: Publish test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rayao-test-results
           path: |
             TestResults/**
             **/*.trx
-          if-no-files-found: error
+          if-no-files-found: warn
