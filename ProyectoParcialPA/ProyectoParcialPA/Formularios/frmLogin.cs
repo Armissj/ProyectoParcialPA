@@ -30,5 +30,10 @@ namespace ProyectoParcialPA.Formularios
             }
         }
         private void btnSalir_Click(object sender, EventArgs e) { DialogResult = DialogResult.Cancel; Close(); }
+
+        private void picLogo_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

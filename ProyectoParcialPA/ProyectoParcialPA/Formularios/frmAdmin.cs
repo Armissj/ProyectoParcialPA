@@ -87,5 +87,15 @@ namespace ProyectoParcialPA.Formularios
         private void cboFiltro_SelectedIndexChanged(object sender, EventArgs e) { if (!cargando && IsHandleCreated) ActualizarInventario(false); }
         private void cboPlataforma_SelectedIndexChanged(object sender, EventArgs e) { if (!cargando && IsHandleCreated) ActualizarInventario(false); }
         private void cboRetro_SelectedIndexChanged(object sender, EventArgs e) { if (!cargando && IsHandleCreated) ActualizarInventario(false); }
+
+        private void lblEstado_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void frmAdmin_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
