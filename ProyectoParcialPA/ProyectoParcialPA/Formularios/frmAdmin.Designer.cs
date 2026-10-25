@@ -439,7 +439,7 @@
             this.lblEstado.Text = "Inventario actual · RAYAO*";
             this.lblEstado.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular);
             this.lblEstado.ForeColor = System.Drawing.Color.FromArgb(98, 103, 95);
-            this.lblEstado.BackColor = System.Drawing.Color.Transparent;
+            this.lblEstado.BackColor = System.Drawing.Color.FromArgb(245, 243, 236);
             this.lblEstado.AutoSize = false;
             // lbl_cboPlataforma
             this.lbl_cboPlataforma.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;

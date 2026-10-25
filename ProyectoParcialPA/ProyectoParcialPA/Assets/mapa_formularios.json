@@ -1,0 +1,56 @@
+﻿{
+  "frmLogin": {
+    "fondo": "Assets/png/fondos/fondo_login.png",
+    "codigo": "Formularios/frmLogin.cs",
+    "disenador": "Formularios/frmLogin.Designer.cs",
+    "recurso": "Formularios/frmLogin.resx"
+  },
+  "frmAdmin": {
+    "fondo": "Assets/png/fondos/fondo_admin.png",
+    "codigo": "Formularios/frmAdmin.cs",
+    "disenador": "Formularios/frmAdmin.Designer.cs",
+    "recurso": "Formularios/frmAdmin.resx"
+  },
+  "frmUsuarios": {
+    "fondo": "Assets/png/fondos/fondo_usuarios.png",
+    "codigo": "Formularios/frmUsuarios.cs",
+    "disenador": "Formularios/frmUsuarios.Designer.cs",
+    "recurso": "Formularios/frmUsuarios.resx"
+  },
+  "frmClientes": {
+    "fondo": "Assets/png/fondos/fondo_clientes.png",
+    "codigo": "Formularios/frmClientes.cs",
+    "disenador": "Formularios/frmClientes.Designer.cs",
+    "recurso": "Formularios/frmClientes.resx"
+  },
+  "frmProveedores": {
+    "fondo": "Assets/png/fondos/fondo_proveedores.png",
+    "codigo": "Formularios/frmProveedores.cs",
+    "disenador": "Formularios/frmProveedores.Designer.cs",
+    "recurso": "Formularios/frmProveedores.resx"
+  },
+  "frmProducto": {
+    "fondo": "Assets/png/fondos/fondo_producto.png",
+    "codigo": "Formularios/frmProducto.cs",
+    "disenador": "Formularios/frmProducto.Designer.cs",
+    "recurso": "Formularios/frmProducto.resx"
+  },
+  "frmCompra": {
+    "fondo": "Assets/png/fondos/fondo_compra.png",
+    "codigo": "Formularios/frmCompra.cs",
+    "disenador": "Formularios/frmCompra.Designer.cs",
+    "recurso": "Formularios/frmCompra.resx"
+  },
+  "frmVenta": {
+    "fondo": "Assets/png/fondos/fondo_venta.png",
+    "codigo": "Formularios/frmVenta.cs",
+    "disenador": "Formularios/frmVenta.Designer.cs",
+    "recurso": "Formularios/frmVenta.resx"
+  },
+  "frmReportes": {
+    "fondo": "Assets/png/fondos/fondo_reportes.png",
+    "codigo": "Formularios/frmReportes.cs",
+    "disenador": "Formularios/frmReportes.Designer.cs",
+    "recurso": "Formularios/frmReportes.resx"
+  }
+}

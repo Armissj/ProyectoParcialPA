@@ -1,0 +1,19 @@
+﻿{
+  "Teclado": "teclado.png",
+  "Mouse": "mouse.png",
+  "MonitorPC": "monitor.png",
+  "Procesador": "procesador.png",
+  "MemoriaRAM": "memoria_ram.png",
+  "TarjetaGrafica": "tarjeta_grafica.png",
+  "Microfono": "microfono.png",
+  "InterfazAudio": "interfaz_audio.png",
+  "Vinilo": "vinilo.png",
+  "PerifericoPS5": "control_ps5.png",
+  "PerifericoSwitch": "control_switch.png",
+  "ProductoGaming": {
+    "Consola PS5": "ps5.png",
+    "Consola Switch": "switch.png",
+    "Consola retro": "consola_retro.png",
+    "Videojuego": "videojuego.png"
+  }
+}

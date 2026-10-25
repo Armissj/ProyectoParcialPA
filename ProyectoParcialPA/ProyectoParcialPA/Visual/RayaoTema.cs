@@ -10,6 +10,7 @@ namespace ProyectoParcialPA.Visual
     public static class RayaoTema
     {
         private static readonly Dictionary<string, Image> Imagenes = new Dictionary<string, Image>(StringComparer.OrdinalIgnoreCase);
+        private static Icon iconoAplicacion;
         public static string RutaPng = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "png");
 
         public static Image Imagen(string relativa)
@@ -27,6 +28,8 @@ namespace ProyectoParcialPA.Visual
         public static void Aplicar(Form formulario, string fondo)
         {
             if (LicenseManager.UsageMode == LicenseUsageMode.Designtime) return;
+            string rutaIcono = Path.Combine(RutaPng, "iconos", "app.ico");
+            if (File.Exists(rutaIcono)) { if (iconoAplicacion == null) iconoAplicacion = new Icon(rutaIcono); formulario.Icon = iconoAplicacion; }
             formulario.BackgroundImage = Imagen("fondos/" + fondo + ".png");
             formulario.BackgroundImageLayout = ImageLayout.Stretch;
             Decorar(formulario);
@@ -143,7 +146,7 @@ namespace ProyectoParcialPA.Visual
         public static void LiberarImagenes()
         {
             foreach (Image imagen in Imagenes.Values) imagen.Dispose();
-            Imagenes.Clear();
+            Imagenes.Clear(); if (iconoAplicacion != null) { iconoAplicacion.Dispose(); iconoAplicacion = null; }
         }
     }
 }
