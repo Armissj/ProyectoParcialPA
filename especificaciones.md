@@ -1,4 +1,4 @@
-# RAYAO\* - Especificaciones del sistema
+﻿# RAYAO\* - Especificaciones del sistema
 
 **Versión:** 0.2 - sistema de tienda con compras y ventas  
 **Fecha:** 24 de octubre de 2026  
@@ -341,3 +341,12 @@ En cada etapa revisaremos el código y ejecutaremos sus pruebas. Los casos de es
 Los cambios se trabajarán en ramas y se revisarán con Pull Requests antes de integrarlos a main. También prepararemos un flujo de GitHub Actions para compilar y ejecutar las pruebas automáticas.
 
 Si cambia una función, primero actualizamos las especificaciones y el plan. Los fondos, iconos y demás recursos visuales se prepararán con el estilo de RAYAO* cuando tengamos definidas las pantallas.
+
+## Aclaraciones de la implementación entregada
+
+- Cliente y proveedor requieren sus datos de contacto; se valida email y teléfono antes de guardar.
+- Las unidades totales del resumen se calculan con long; el stock de cada producto sigue siendo int.
+- Se incorporó Cargar ejemplo como ayuda opcional del administrador. Crea un catálogo de muestra una sola vez por ejecución y mantiene stock cero; no registra compras ni ventas ficticias.
+- Los formularios ya están conectados a los controladores, con exportación CSV y comprobante imprimible.
+- El historial usa copias de los valores confirmados y el usuario vigente de la sesión.
+- Las evidencias locales identifican Mono como entorno de ejecución. La ejecución de Windows y el diseñador se verifican en Visual Studio/GitHub Actions.
