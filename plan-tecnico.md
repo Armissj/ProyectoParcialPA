@@ -20,14 +20,15 @@ La idea central es desarrollar una aplicación de escritorio en C# con Windows F
 
 ## 2. Estado actual del repositorio
 
-El proyecto actual ya existe en la solución y tiene una estructura mínima de Windows Forms, pero actualmente:
+El proyecto actual ya existe en la solución y ahora se ha preparado la base técnica para la etapa 1A y 1B:
 
-- El proyecto principal no está organizado por capas.
-- Tiene una clase base `Form1` sin lógica.
-- El archivo del proyecto apunta a .NET Framework 4.8.
-- No hay infraestructura de entidades, controladores, formularios ni pruebas.
+- La solución existente está en la raíz del repositorio como `ProyectoParcialPA.slnx`.
+- El proyecto principal está ajustado a .NET Framework 4.7.2.
+- El proyecto de pruebas `ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj` está en net472 con MSTest y referencia al proyecto principal.
+- Ya se han implementado las clases base `Producto`, `PerifericoPC` y `Teclado`, junto con sus pruebas de validación iniciales.
+- La estructura del proyecto aún no contiene formularios ni controladores del negocio; se dejará para etapas posteriores.
 
-Por tanto, la primera etapa del plan deberá ajustar el objetivo del proyecto a .NET Framework 4.7.2, sin cambiar el código de negocio aún, y dejar listo el arranque para empezar a implementar la arquitectura solicitada.
+La preparación actual cumple la base técnica necesaria para continuar con la etapa 1B y con la implementación del dominio restante.
 
 ## 3. Objetivo de tecnología
 
