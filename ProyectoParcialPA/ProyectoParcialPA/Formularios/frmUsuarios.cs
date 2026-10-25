@@ -15,7 +15,7 @@ namespace ProyectoParcialPA.Formularios
         public frmUsuarios()
         {
             InitializeComponent(); RayaoTema.Aplicar(this, "fondo_usuarios");
-            Ui.AlCargar(this, "GestionarUsuarios", delegate { CargarListado(); Nuevo(); });
+            Ui.AlCargar(this, "GestionarUsuarios", delegate { CargarListado(); Nuevo(); lblSubtitulo.Text = "Cuentas de ejemplo. Nuevo prepara otra cuenta; la contraseña de las cuentas existentes no se muestra."; });
         }
         private void CargarListado()
         {
@@ -24,7 +24,7 @@ namespace ProyectoParcialPA.Formularios
             Ui.Tabla(dgvUsuarios, TListaUsuario.Usuarios.Where(u => u.NombreUsuario.IndexOf(texto, StringComparison.OrdinalIgnoreCase) >= 0).Select(u => new { Id = u.Id, Usuario = u.NombreUsuario, Rol = u.Rol.ToString(), Activo = u.Activo }).ToList());
             dgvUsuarios.ClearSelection(); dgvUsuarios.CurrentCell = null; cargando = false;
         }
-        private void Nuevo() { cargando = true; dgvUsuarios.ClearSelection(); dgvUsuarios.CurrentCell = null; idActual = 0; chkActivo.Enabled = false; txtNombreUsuario.Clear(); txtPassword.Clear(); cboRol.SelectedItem = "Vendedor"; chkActivo.Checked = true; txtNombreUsuario.Focus(); cargando = false; }
+        private void Nuevo() { cargando = true; dgvUsuarios.ClearSelection(); dgvUsuarios.CurrentCell = null; idActual = 0; chkActivo.Enabled = false; txtNombreUsuario.Text = EjemplosFormulario.NombreUsuario(); txtPassword.Text = "Vendedor123*"; cboRol.SelectedItem = "Vendedor"; chkActivo.Checked = true; txtNombreUsuario.Focus(); cargando = false; }
         internal bool GuardarActual(out string mensaje)
         {
             mensaje = "";

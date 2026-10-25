@@ -21,9 +21,18 @@ namespace ProyectoParcialPA.Formularios
                 Ui.Combo(cboProveedor, TListaProveedor.ObtenerTodos(), "Nombre", "Id");
                 var productos = TListaProducto.ObtenerTodos().Select(p => new { Codigo = p.Codigo, Descripcion = p.Codigo + " · " + p.Nombre }).ToList();
                 Ui.Combo(cboProducto, productos, "Descripcion", "Codigo"); cboProducto.DropDownWidth = 520;
-                cargando = false; ProductoSeleccionado(); ActualizarDetalle();
+                cargando = false; ProductoSeleccionado(); PrepararBorradorEjemplo(); ActualizarDetalle();
                 if (cboProveedor.Items.Count == 0 || cboProducto.Items.Count == 0) lblInfo.Text = "Registra primero un proveedor y productos desde el menú principal.";
             });
+        }
+        private void PrepararBorradorEjemplo()
+        {
+            if (!DatosEjemplo.EstanCargados || cboProveedor.Items.Count == 0) return;
+            foreach (var p in TListaProducto.ObtenerTodos().Take(2))
+                TListaCompra.AgregarDetalleCompra(operacion, p, 2, Math.Max(0.01m, decimal.Round(p.Precio * 0.65m, 2)));
+            var primero = Seleccionado();
+            if (primero != null) numCosto.Value = Math.Max(0.01m, decimal.Round(primero.Precio * 0.65m, 2));
+            lblInfo.Text = "Borrador de ejemplo. Revisa sus líneas y confirma para ingresar stock; Cancelar no registra nada.";
         }
         private Producto Seleccionado() { return TListaProducto.BuscarPorCodigo(Convert.ToString(cboProducto.SelectedValue)); }
         private void ProductoSeleccionado()

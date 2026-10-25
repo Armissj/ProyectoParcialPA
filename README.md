@@ -1,57 +1,47 @@
 ﻿# RAYAO* · Tienda de PC, gaming y música
 
-Proyecto académico de Mateo Armijos. C#, Windows Forms y .NET Framework 4.7.2, con Entidades, Controladores y Formularios.
+Proyecto académico de Mateo Armijos. C#, Windows Forms y .NET Framework 4.7.2, organizado en Entidades, Controladores y Formularios.
 
 ## Abrir y ejecutar
 
-1. Abre la solución de la raíz: ProyectoParcialPA.slnx.
-2. Establece ProyectoParcialPA como proyecto de inicio y ejecuta con F5.
-3. Entra como administrador o vendedor.
+Abre ProyectoParcialPA.slnx desde la raíz. En Visual Studio establece **ProyectoParcialPA** como proyecto de inicio y ejecuta F5. El proyecto ProyectoParcialPA.Tests contiene las pruebas.
 
-| Rol | Usuario | Contraseña de demostración |
+El login prepara una demostración en segundo plano y muestra el estado mientras carga. Al terminar puedes usar los botones Ejemplo admin y Ejemplo vendedor; completan las credenciales y debes pulsar Entrar. La preparación no deja una sesión iniciada.
+
+| Rol | Usuario | Contraseña inicial de demostración |
 | --- | --- | --- |
 | Administrador | admin | Admin123* |
 | Vendedor | vendedor | Vendedor123* |
+| Vendedor de caja | caja_demo | Caja123* |
+| Administrador de ejemplo | encargado_demo | Encargado123* |
 
-Las contraseñas se guardan como PBKDF2-HMAC-SHA256 con salt individual y 600000 iteraciones. Las cuentas de demostración se crean una sola vez por ejecución.
+Las contraseñas se guardan como PBKDF2-HMAC-SHA256, con salt individual y 600000 iteraciones. Las credenciales de la tabla son las de la demostración, no datos de usuarios reales.
 
-## Qué puedes hacer
+## Ejemplos de la etapa 7
 
-- Gestionar los 12 tipos concretos de productos de PC, audio, vinilos y consolas.
-- Buscar por código, nombre o artista y combinar tipo, plataforma y retro.
-- Gestionar clientes, proveedores y usuarios con permisos por rol.
-- Registrar compras y ventas con varios productos, validación de stock y confirmación única.
-- Consultar el historial con sus datos originales, ver comprobantes e imprimirlos.
-- Consultar reportes de inventario, compras y ventas y exportar CSV.
+La carga inicial crea 24 productos de los 12 tipos concretos, 6 clientes, 4 proveedores, 4 usuarios, 3 compras y 3 ventas. Las compras ingresan 288 unidades y las ventas descuentan 12: el stock total queda en **276 unidades**. PC001 empieza con 10 unidades y PC002 con 11.
 
-## Preparar la demostración
+Los movimientos de ejemplo se registran usando los mismos controladores y validaciones de la tienda. Los productos nuevos siguen empezando con stock cero. Los contactos y precios son ficticios. Las selecciones de vinilos underground están identificadas como Demo; no representan ediciones comerciales verificadas.
 
-Como administrador, pulsa **Cargar ejemplo**. Se agregan 16 productos de muestra, un cliente y un proveedor; todos los productos comienzan con stock cero. Los nombres y precios son datos de demostración. El botón conserva los registros existentes y evita cargar el ejemplo dos veces.
+La carga ocurre una sola vez por ejecución y conserva los registros existentes. Cerrar sesión mantiene los datos y las modificaciones; cerrar el programa pierde todas las listas y prepara una demostración nueva al volver a abrirlo.
 
-Compra 5 unidades de PC001 a costo 18.00; después vende 2 a precio 25.50. La compra suma 90.00, la venta suma 51.00 y el stock queda en 3. El valor de inventario de ese producto será 76.50.
+## Pantallas conectadas
 
-## Memoria y permisos
+- Login: preparación de la demo y ejemplos de credenciales.
+- Principal: inventario, resúmenes, búsquedas y filtros.
+- Productos: el botón Productos abre la ficha seleccionada; si no hay selección, el administrador abre un alta. Agregar producto prepara un ejemplo editable de cada tipo. El vendedor abre la ficha en consulta.
+- Usuarios, clientes y proveedores: listas con ejemplos y una ficha de alta preparada. Guardar confirma la creación; seleccionar una fila permite consultar o editar según el rol. La contraseña de una cuenta existente permanece vacía en el editor.
+- Compra y venta: borradores de dos productos para revisar, modificar, quitar, confirmar o cancelar. Abrir o cancelar no registra movimientos.
+- Reportes: inventario actual e historial de compras y ventas por fechas y tipo, con exportación CSV.
 
-Los datos viven en listas estáticas en memoria. Cerrar sesión conserva la tienda; cerrar el programa pierde los datos. El vendedor consulta productos y proveedores, gestiona clientes, compra, vende y consulta reportes. El administrador gestiona todos los módulos.
+El administrador gestiona todos los módulos. El vendedor consulta productos y proveedores, gestiona clientes, compra, vende y consulta reportes; no administra usuarios ni modifica el inventario desde la ficha.
 
-## Compilación y pruebas
+## Recursos y pruebas
 
-En Windows, scripts/Verificar.ps1 restaura, compila y ejecuta MSTest, y genera un TRX nuevo. La solución contiene el proyecto de pruebas separado net472.
+Los nueve formularios conservan .cs, .Designer.cs y .resx. Assets debe estar junto a ProyectoParcialPA.csproj; el proyecto copia sus recursos al directorio de salida al compilar.
 
-La entrega incorpora 90 pruebas MSTest. En la preparación se ejecutaron sus aserciones mediante un runner por reflexión en Mono: 90 superadas, 0 fallidas. También se ejecutó un recorrido gráfico con 61 comprobaciones de interfaz. Documentacion/VALIDACION.md detalla el entorno y las comprobaciones pendientes de Windows.
+Se ejecutaron **96 métodos de prueba con las aserciones reales de MSTest** mediante un runner por reflexión en Mono: 96 superados, 0 fallidos. El recorrido gráfico de la etapa 7 pasó **68 comprobaciones**. Se reprodujo además el fallo anterior: el botón Productos de la etapa 6 no abría frmProducto.
 
-GitHub Actions compila y ejecuta las pruebas en Windows. El resultado remoto solo queda confirmado después del push; consulta el job Build and test y el artefacto rayao-test-results.
+La ejecución de Visual Studio, VSTest/GitHub Actions, diseñador e impresión en Windows queda por confirmar en ese entorno. scripts/Verificar.ps1 realiza la restauración, compilación y pruebas y genera un TRX de Windows. Documentacion/VALIDACION.md detalla el alcance.
 
-## Organización
-
-| Ruta | Contenido |
-| --- | --- |
-| ProyectoParcialPA/ProyectoParcialPA | Programa WinForms |
-| ProyectoParcialPA/ProyectoParcialPA.Tests | Pruebas MSTest |
-| Entidades, dentro del programa | Productos, usuarios, clientes, proveedores y movimientos |
-| Controladores, dentro del programa | Listas, permisos y reglas de negocio |
-| Formularios, dentro del programa | Nueve pantallas editables |
-| Assets/png, dentro del programa | Fondos, productos, iconos y logo |
-| Documentacion | Guía de demostración, validación y explicación para exponer |
-
-La integración se entrega también por bloques para registrar cada avance en GitHub. El código y sus resultados se revisaron con apoyo de IA.
+Para exponer, sigue Documentacion/GUIA_DEMO.md y GUION_EXPOSICION.md.

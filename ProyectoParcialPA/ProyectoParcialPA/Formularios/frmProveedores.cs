@@ -19,7 +19,10 @@ namespace ProyectoParcialPA.Formularios
                 bool gestionar = TListaUsuario.TienePermiso("GestionarProveedores");
                 btnGuardar.Enabled = gestionar; btnNuevo.Enabled = gestionar; btnDesactivar.Enabled = gestionar; chkActivo.Enabled = gestionar;
                 txtNombre.ReadOnly = !gestionar; txtContacto.ReadOnly = !gestionar; txtTelefono.ReadOnly = !gestionar; txtEmail.ReadOnly = !gestionar;
-                CargarListado(); Nuevo();
+                CargarListado();
+                if (gestionar) Nuevo();
+                else if (dgvProveedores.Rows.Count > 0) { dgvProveedores.CurrentCell = dgvProveedores.Rows[0].Cells["Nombre"]; dgvProveedores_SelectionChanged(this, EventArgs.Empty); }
+                lblSubtitulo.Text = "Ejemplos cargados. Nuevo prepara una ficha editable; Guardar confirma los cambios.";
             });
         }
         private void CargarListado()
@@ -28,7 +31,12 @@ namespace ProyectoParcialPA.Formularios
             Ui.Tabla(dgvProveedores, TListaProveedor.BuscarPorNombre(txtBuscar.Text).Select(x => new { Id = x.Id, Nombre = x.Nombre, Contacto = x.Contacto, Telefono = x.Telefono, Email = x.Email, Activo = x.Activo }).ToList());
             dgvProveedores.ClearSelection(); dgvProveedores.CurrentCell = null; cargando = false;
         }
-        private void Nuevo() { cargando = true; dgvProveedores.ClearSelection(); dgvProveedores.CurrentCell = null; idActual = 0; chkActivo.Enabled = false; txtNombre.Clear(); txtContacto.Clear(); txtTelefono.Clear(); txtEmail.Clear(); chkActivo.Checked = true; txtNombre.Focus(); cargando = false; }
+        private void Nuevo()
+        {
+            cargando = true; dgvProveedores.ClearSelection(); dgvProveedores.CurrentCell = null; idActual = 0; chkActivo.Enabled = false;
+            var ejemplo = EjemplosFormulario.Proveedor(); txtNombre.Text = ejemplo.Nombre; txtContacto.Text = ejemplo.Contacto; txtTelefono.Text = ejemplo.Telefono; txtEmail.Text = ejemplo.Email;
+            chkActivo.Checked = true; txtNombre.Focus(); cargando = false;
+        }
         internal bool GuardarActual(out string mensaje)
         {
             var registro = new Proveedor

@@ -1,29 +1,23 @@
-﻿# Verificación de la entrega
+﻿# Validación · Etapa 7
 
-## Resultados ejecutados
+## Evidencia ejecutada
 
-- Compilación del programa completo mediante Mono C# 6.8: correcta.
-- 90 métodos de prueba con las aserciones de MSTest 4.5.1: 90 superados, 0 fallidos.
-- Runner local: invocación por reflexión de cada prueba, con inicialización y limpieza. Las pruebas se ejecutaron de manera secuencial.
-- Tras añadir comprobaciones explícitas al test de permisos, se volvió a ejecutar ese caso: correcto.
-- Flujo gráfico WinForms ejecutado en Mono y pantalla virtual: 61 comprobaciones correctas.
+- Compilación del programa con Mono C# 6.8: correcta, sin advertencias.
+- 96 métodos de prueba con las aserciones de MSTest 4.5.1 mediante runner por reflexión: 96 superados, 0 fallidos. Inicialización y limpieza ejecutadas por caso, de forma secuencial.
+- Siete pruebas de carga y plantillas: permisos, datos de todos los módulos, balance de stock contra historial, repetición sin duplicados, conservación de datos existentes, preparación sin dejar una sesión abierta y códigos de ejemplo únicos.
+- Recorrido WinForms en Mono con pantalla virtual: 68 comprobaciones correctas.
+- Comparación con la compilación anterior de la etapa 6: el botón Productos devolvía BOTON_PRODUCTOS_ABRE_FRMPRODUCTO=False. La etapa 7 abrió el diálogo desde ese botón y desde Agregar producto.
 
-El recorrido gráfico usó los controles y eventos reales: login, catálogo de ejemplo, alta de cliente y proveedor, alta de los 12 tipos, filtros, compra de cinco, venta de dos, stock tres, comprobante, rechazo de stock insuficiente, cancelación, reporte, CSV, alta de usuario, edición, roles y cambio de sesión.
+El recorrido gráfico probó login real como administrador y vendedor, carga automática, las doce plantillas de producto, guardado, edición de un vinilo existente, clientes, proveedores y usuarios, borradores de compra y venta, cancelación sin efectos, confirmación, comprobante, los tres reportes y CSV. La ficha del vendedor se comprobó en consulta y rechazó guardar.
 
-Las capturas corresponden al programa ejecutado en ese entorno con datos de prueba; la tipografía y los controles pueden verse ligeramente distintos en Windows.
+## Entorno y límites
 
-## Límites de esta verificación
+No se ejecutó Visual Studio ni VSTest de Windows dentro de este entorno. Los XML incluidos son resultados locales del runner de Mono, no un TRX de Windows. Las capturas muestran el programa ejecutado en Mono; los controles y la tipografía pueden verse distintos en Windows.
 
-No se ejecutó Visual Studio ni VSTest de Windows dentro de este entorno. Los XML locales son evidencias del runner de Mono y están identificados como tales. No son un TRX producido por GitHub Actions. El TRX de Windows se obtendrá al ejecutar scripts/Verificar.ps1 o publicar el cambio y esperar el workflow.
+Queda ejecutar scripts/Verificar.ps1 y el workflow en Windows, y comprobar el diseñador y la impresión en el equipo de exposición. La etapa 7 conserva los archivos .Designer.cs y .resx, y no cambia la configuración de permisos ni la protección de contraseñas de la tienda.
 
-El diseñador de Visual Studio y la impresión con una impresora real o PDF deben comprobarse en el equipo de exposición. La función de impresión está conectada al comprobante, pero no se envió ningún trabajo de impresión durante estas pruebas.
+## Cambio de la regla de ejemplos
 
-## CI
+La etapa 6 cargaba un catálogo opcional sin stock. Por petición del usuario, la etapa 7 prepara automáticamente una tienda completa de demostración. Los productos se crean con stock cero; las compras y ventas confirmadas generan sus existencias e historial. Preparar las fichas de alta o los borradores no guarda nada hasta la acción del usuario.
 
-Se corrigió el registro de TListaProducto y ResumenInventario en el proyecto. El fallo recibido en GitHub se debía a que el .csproj actualizado no había entrado en el commit 0ed385e.
-
-El workflow conserva el runner Windows, .NET Framework 4.7.2, restauración, compilación, pruebas, comprobación de contador ejecutado y publicación del TRX. Los resultados remotos siguen pendientes hasta el push del usuario.
-
-## Evidencias
-
-La carpeta de evidencias de la entrega incluye el XML de las 90 pruebas, el log del recorrido gráfico y las capturas. Los tests de compras y ventas verifican también casos que no se muestran en la demo: desbordamientos, líneas repetidas, participantes inactivos, copias protegidas y conservación del historial.
+La carga inicial ocurre antes de habilitar el login y cierra la sesión temporal de preparación. Entrar a la tienda sigue exigiendo una autenticación válida. Las cargas posteriores no reinician las listas ni reemplazan registros ya existentes.

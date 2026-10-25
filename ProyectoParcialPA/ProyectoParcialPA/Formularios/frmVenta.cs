@@ -21,9 +21,16 @@ namespace ProyectoParcialPA.Formularios
                 Ui.Combo(cboCliente, TListaCliente.ObtenerTodos().Select(c => new { Id = c.Id, Nombre = c.NombreCompleto }).ToList(), "Nombre", "Id");
                 var productos = TListaProducto.ObtenerTodos().Select(p => new { Codigo = p.Codigo, Descripcion = p.Codigo + " · " + p.Nombre }).ToList();
                 Ui.Combo(cboProducto, productos, "Descripcion", "Codigo"); cboProducto.DropDownWidth = 520;
-                cargando = false; ProductoSeleccionado(); ActualizarDetalle();
+                cargando = false; ProductoSeleccionado(); PrepararBorradorEjemplo(); ActualizarDetalle();
                 if (cboCliente.Items.Count == 0 || cboProducto.Items.Count == 0) lblInfo.Text = "Registra primero un cliente y productos desde el menú principal.";
             });
+        }
+        private void PrepararBorradorEjemplo()
+        {
+            if (!DatosEjemplo.EstanCargados || cboCliente.Items.Count == 0) return;
+            foreach (var p in TListaProducto.ObtenerTodos().Where(p => p.Stock > 0).Take(2))
+                TListaVenta.AgregarDetalleVenta(operacion, p, 1, p.Precio);
+            lblInfo.Text = "Borrador de ejemplo. Revisa el cliente y las líneas; Confirmar registra la venta y su comprobante.";
         }
         private Producto Seleccionado() { return TListaProducto.BuscarPorCodigo(Convert.ToString(cboProducto.SelectedValue)); }
         private void ProductoSeleccionado()

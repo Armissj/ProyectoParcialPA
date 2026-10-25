@@ -35,7 +35,7 @@ ResumenInventario contiene cantidad de productos int, unidades totales long y va
 - TListaUsuario: autenticación y gestión, permisos efectivos y protección del último administrador activo.
 - TListaCliente / TListaProveedor: CRUD lógico, búsqueda, validación e Id automático.
 - TListaCompra / TListaVenta: preparación, validación, confirmación, historial y consulta por fechas o participante.
-- DatosEjemplo: catálogo opcional de muestra, autorizado solo al administrador, sin introducir stock.
+- DatosEjemplo: preparación automática antes del login, con 24 productos, 6 clientes, 4 proveedores, 4 cuentas, 3 compras y 3 ventas. La carga pública continúa restringida al administrador y las existencias provienen de operaciones confirmadas.
 
 EstadoTienda proporciona un bloqueo compartido para confirmar inventario e historial juntos. Los controladores de movimientos preparan todas las copias, totales e identidades antes de publicar cambios. Cantidades repetidas se agrupan por código para comprobar stock. Se consolidan líneas si coinciden código e importe; importes distintos conservan líneas separadas.
 
@@ -73,7 +73,7 @@ RayaoTema carga Assets/png desde el directorio del ejecutable. El proyecto copia
 
 Microsoft.NET.Test.Sdk 18.11.0; MSTest.TestAdapter y MSTest.TestFramework 4.5.1. Las pruebas compartidas se ejecutan sin paralelismo para aislar las listas estáticas.
 
-Se conservaron las 42 pruebas recibidas y se añadieron regresiones, personas, movimientos, presentación y catálogo. Total final: 90. La ejecución local por reflexión sobre MSTest en Mono pasó las 90; el recorrido gráfico pasó 61 comprobaciones. Las evidencias identifican ese entorno y no se presentan como una ejecución de VSTest en Windows.
+Se conservaron las pruebas del dominio y se ampliaron las de ejemplos. Total de la etapa 7: 96. La ejecución local por reflexión sobre MSTest en Mono pasó las 96; el recorrido gráfico de la etapa 7 pasó 68 comprobaciones. Las evidencias identifican ese entorno y no se presentan como una ejecución de VSTest en Windows.
 
 GitHub Actions restaura y compila la solución, ejecuta VSTest, comprueba código de salida y que el TRX tenga pruebas ejecutadas, y publica el resultado. Actualizaciones de acciones verificadas en los repositorios oficiales de actions/checkout, actions/setup-dotnet, actions/upload-artifact y microsoft/setup-msbuild.
 
@@ -95,3 +95,15 @@ Cada bloque se entrega con sus archivos y un commit sugerido. La publicación y 
 - Probar impresión con una impresora o controlador PDF instalado.
 
 La compilación con Mono, las aserciones y la ejecución gráfica local ya se comprobaron. La guía de demo cubre compra 5, venta 2 y stock final 3.
+
+
+## Etapa 7 · Correcciones y ejemplos completos
+
+- Productos abre frmProducto desde el menú; Agregar prepara un alta y el vendedor usa una ficha de consulta.
+- La navegación crea los formularios dentro del manejo de errores y presenta el mensaje si una pantalla no puede abrirse.
+- Login prepara los ejemplos en segundo plano, cierra la sesión de preparación y mantiene la autenticación normal.
+- Las doce plantillas tienen datos válidos y códigos nuevos; la edición conserva los datos del producto existente.
+- Usuarios, clientes y proveedores muestran listas cargadas y nuevas fichas de ejemplo editables.
+- Compra y venta abren borradores de dos líneas. Abrir o cancelar conserva existencias e historial.
+- Los reportes tienen compras, ventas e inventario de muestra desde el primer inicio.
+- Rama sugerida: fix/etapa7-productos-ejemplos. La aplicación se comprueba en Windows después de copiar los archivos de esta etapa.

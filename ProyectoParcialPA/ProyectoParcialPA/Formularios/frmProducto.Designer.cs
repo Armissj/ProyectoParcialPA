@@ -34,6 +34,7 @@
             this.pnlCampos = new System.Windows.Forms.FlowLayoutPanel();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
+            this.btnEjemplo = new System.Windows.Forms.Button();
             this.picProducto = new System.Windows.Forms.PictureBox();
             this.lblFicha = new System.Windows.Forms.Label();
             this.lblAyuda = new System.Windows.Forms.Label();
@@ -307,6 +308,16 @@
             this.pnlDatos.Controls.Add(this.pnlCampos);
             this.pnlDatos.Controls.Add(this.btnGuardar);
             this.pnlDatos.Controls.Add(this.btnCancelar);
+            this.btnEjemplo.Name = "btnEjemplo";
+            this.btnEjemplo.Text = "Usar datos de ejemplo";
+            this.btnEjemplo.Location = new System.Drawing.Point(728, 642);
+            this.btnEjemplo.Size = new System.Drawing.Size(395, 38);
+            this.btnEjemplo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            this.btnEjemplo.BackColor = System.Drawing.Color.FromArgb(209, 255, 50);
+            this.btnEjemplo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnEjemplo.FlatAppearance.BorderSize = 0;
+            this.btnEjemplo.Click += new System.EventHandler(this.btnEjemplo_Click);
+            this.Controls.Add(this.btnEjemplo);
             this.Controls.Add(this.picProducto);
             this.Controls.Add(this.lblFicha);
             this.Controls.Add(this.lblAyuda);
@@ -348,6 +359,7 @@
         internal System.Windows.Forms.FlowLayoutPanel pnlCampos;
         internal System.Windows.Forms.Button btnGuardar;
         internal System.Windows.Forms.Button btnCancelar;
+        internal System.Windows.Forms.Button btnEjemplo;
         internal System.Windows.Forms.PictureBox picProducto;
         internal System.Windows.Forms.Label lblFicha;
         internal System.Windows.Forms.Label lblAyuda;

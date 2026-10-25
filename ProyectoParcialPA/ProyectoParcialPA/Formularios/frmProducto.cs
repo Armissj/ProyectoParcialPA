@@ -12,27 +12,58 @@ namespace ProyectoParcialPA.Formularios
     public partial class frmProducto : Form
     {
         private string codigoOriginal;
-        public frmProducto()
-        {
-            InitializeComponent(); RayaoTema.Aplicar(this, "fondo_producto"); RayaoTema.FormatearTipos(cboTipoProducto);
-            if (cboTipoProducto.Items.Count > 0) cboTipoProducto.SelectedIndex = 0;
-            Ui.AlCargar(this, "GestionarProductos", delegate { });
-        }
-        public frmProducto(Producto producto) : this()
+        private bool inicializando;
+        private bool soloConsulta;
+        public frmProducto() { Preparar(null, false); }
+        public frmProducto(Producto producto) : this(producto, false) { }
+        public frmProducto(Producto producto, bool consulta)
         {
             if (producto == null) throw new ArgumentNullException("producto");
-            codigoOriginal = producto.Codigo; txtCodigo.Text = producto.Codigo; txtCodigo.ReadOnly = true;
-            txtNombre.Text = producto.Nombre; numPrecio.Maximum = Math.Max(numPrecio.Maximum, producto.Precio); numPrecio.Value = producto.Precio;
-            txtStock.Text = producto.Stock.ToString(); chkActivo.Checked = producto.Activo;
-            cboTipoProducto.SelectedItem = producto.GetType().Name; CargarCamposEspecificos(EditorProducto.Leer(producto));
-            cboTipoProducto.Enabled = !TListaProducto.TieneMovimientos(producto.Codigo);
-            if (!cboTipoProducto.Enabled) lblAyuda.Text = "Este producto tiene movimientos. El tipo y el stock se conservan; puedes editar sus otros datos.";
-            lblTitulo.Text = "Editar producto"; btnGuardar.Text = "Guardar cambios";
+            Preparar(producto, consulta);
         }
+        private void Preparar(Producto producto, bool consulta)
+        {
+            codigoOriginal = producto == null ? null : producto.Codigo;
+            soloConsulta = consulta; inicializando = true;
+            InitializeComponent(); RayaoTema.Aplicar(this, "fondo_producto"); RayaoTema.FormatearTipos(cboTipoProducto);
+            if (producto == null) cboTipoProducto.SelectedIndex = 0;
+            else cboTipoProducto.SelectedItem = producto.GetType().Name;
+            inicializando = false; ActualizarCamposTipo();
+            if (producto == null) CargarEjemploActual();
+            else
+            {
+                txtCodigo.Text = producto.Codigo; txtCodigo.ReadOnly = true;
+                txtNombre.Text = producto.Nombre; numPrecio.Maximum = Math.Max(numPrecio.Maximum, producto.Precio); numPrecio.Value = producto.Precio;
+                txtStock.Text = producto.Stock.ToString(); chkActivo.Checked = producto.Activo;
+                CargarCamposEspecificos(EditorProducto.Leer(producto));
+                cboTipoProducto.Enabled = !soloConsulta && !TListaProducto.TieneMovimientos(producto.Codigo);
+                lblTitulo.Text = soloConsulta ? "Consultar producto" : "Editar producto";
+                btnGuardar.Text = "Guardar cambios";
+                lblAyuda.Text = "El código, el tipo con movimientos y el stock se conservan. El stock cambia al confirmar compras o ventas.";
+            }
+            chkActivo.Enabled = false;
+            btnEjemplo.Enabled = producto == null && !soloConsulta;
+            btnGuardar.Visible = !soloConsulta; btnGuardar.Enabled = !soloConsulta;
+            if (soloConsulta)
+            {
+                txtNombre.ReadOnly = true; numPrecio.Enabled = false; cboTipoProducto.Enabled = false;
+                btnCancelar.Text = "Cerrar ficha"; lblAyuda.Text = "Ficha de consulta. El vendedor puede revisar los datos del producto y su stock.";
+            }
+            Ui.AlCargar(this, soloConsulta ? "ConsultarProductos" : "GestionarProductos", delegate { });
+        }
+        internal void CargarEjemploActual()
+        {
+            if (soloConsulta || codigoOriginal != null || cboTipoProducto.SelectedItem == null) return;
+            var ejemplo = EjemplosFormulario.Producto(Convert.ToString(cboTipoProducto.SelectedItem));
+            txtCodigo.Text = ejemplo.Codigo; txtNombre.Text = ejemplo.Nombre; numPrecio.Value = ejemplo.Precio;
+            txtStock.Text = "0"; chkActivo.Checked = true; CargarCamposEspecificos(EditorProducto.Leer(ejemplo));
+            lblAyuda.Text = "Ejemplo editable. Puedes cambiar sus datos y pulsar Guardar. El stock comienza en cero y entra mediante una compra.";
+        }
+        private void btnEjemplo_Click(object sender, EventArgs e) { CargarEjemploActual(); }
         internal bool GuardarActual(out string mensaje)
         {
             mensaje = "";
-            if (!TListaUsuario.TienePermiso("GestionarProductos")) { mensaje = "No tienes permiso para modificar productos."; return false; }
+            if (soloConsulta || !TListaUsuario.TienePermiso("GestionarProductos")) { mensaje = "No tienes permiso para modificar productos."; return false; }
             try
             {
                 var producto = EditorProducto.Crear(Convert.ToString(cboTipoProducto.SelectedItem), txtCodigo.Text, txtNombre.Text, numPrecio.Value, LeerCamposEspecificos());
@@ -49,7 +80,12 @@ namespace ProyectoParcialPA.Formularios
             finally { if (!IsDisposed) btnGuardar.Enabled = true; }
         }
         private void btnCancelar_Click(object sender, EventArgs e) { DialogResult = DialogResult.Cancel; Close(); }
-        private void cboTipoProducto_SelectedIndexChanged(object sender, EventArgs e) { ActualizarCamposTipo(); }
+        private void cboTipoProducto_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (inicializando) return;
+            ActualizarCamposTipo();
+            if (codigoOriginal == null) CargarEjemploActual();
+        }
         private void ActualizarImagen()
         {
             if (cboTipoProducto.SelectedItem == null) return;
@@ -66,7 +102,7 @@ namespace ProyectoParcialPA.Formularios
 
         private void ActualizarCamposTipo()
         {
-            if (pnlCampos == null || cboTipoProducto.SelectedItem == null) return;
+            if (inicializando || pnlCampos == null || cboTipoProducto.SelectedItem == null) return;
             var anteriores = new List<Control>();
             foreach (Control control in pnlCampos.Controls) anteriores.Add(control);
             pnlCampos.Controls.Clear();
@@ -104,6 +140,11 @@ namespace ProyectoParcialPA.Formularios
                 else entrada = new TextBox { Size = new Size(265, 32), BorderStyle = BorderStyle.FixedSingle };
                 entrada.TextChanged += delegate { ActualizarImagen(); };
                 if (entrada is CheckBox) ((CheckBox)entrada).CheckedChanged += delegate { ActualizarImagen(); };
+                if (soloConsulta)
+                {
+                    var texto = entrada as TextBox;
+                    if (texto != null) texto.ReadOnly = true; else entrada.Enabled = false;
+                }
                 entrada.Name = "campo" + nombre;
                 entrada.Location = new Point(0, 25);
                 caja.Controls.Add(etiqueta); caja.Controls.Add(entrada);

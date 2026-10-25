@@ -350,3 +350,14 @@ Si cambia una función, primero actualizamos las especificaciones y el plan. Los
 - Los formularios ya están conectados a los controladores, con exportación CSV y comprobante imprimible.
 - El historial usa copias de los valores confirmados y el usuario vigente de la sesión.
 - Las evidencias locales identifican Mono como entorno de ejecución. La ejecución de Windows y el diseñador se verifican en Visual Studio/GitHub Actions.
+
+
+## Actualización de implementación · Etapa 7
+
+Esta etapa sustituye el catálogo opcional de muestra por una demostración automática al iniciar el programa: 24 productos de los 12 tipos concretos, 6 clientes, 4 proveedores, 4 usuarios, 3 compras y 3 ventas. Las existencias iniciales resultan de las operaciones confirmadas; cada producto nuevo se sigue creando con stock cero.
+
+El botón Productos abre la ficha seleccionada. El administrador puede editarla y el vendedor la consulta sin guardar. Agregar producto prepara un ejemplo editable con código nuevo. Las fichas de clientes, proveedores y usuarios también preparan ejemplos de alta; las cuentas existentes nunca muestran su contraseña.
+
+Compras y ventas preparan borradores editables de dos líneas sin registrar movimientos. Confirmar ejecuta las validaciones y actualiza stock e historial. Cancelar conserva los datos. La preparación inicial se realiza una vez por ejecución y termina con la sesión cerrada; el usuario debe autenticarse para acceder a los módulos.
+
+Los nombres, teléfonos, correos y precios de demostración son ficticios. Los vinilos underground identificados como Demo son ejemplos para el proyecto y no ediciones comerciales verificadas.

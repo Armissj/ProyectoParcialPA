@@ -30,7 +30,7 @@ namespace ProyectoParcialPA.Formularios
             bool gestionar = TListaUsuario.TienePermiso("GestionarProductos");
             btnAgregar.Enabled = gestionar; btnEditar.Enabled = gestionar; btnDesactivar.Enabled = gestionar;
             btnUsuarios.Enabled = TListaUsuario.TienePermiso("GestionarUsuarios");
-            btnEjemplo.Visible = gestionar; btnEjemplo.Enabled = gestionar && !DatosEjemplo.EstanCargados;
+            btnEjemplo.Visible = gestionar; btnEjemplo.Enabled = gestionar && !DatosEjemplo.EstanCargados; btnEjemplo.Text = DatosEjemplo.EstanCargados ? "Ejemplos cargados" : "Cargar ejemplos";
             var todos = TListaProducto.ObtenerTodos();
             if (plataformas)
             {
@@ -47,27 +47,39 @@ namespace ProyectoParcialPA.Formularios
             catch (OverflowException) { lblValor.Text = "Fuera de rango"; }
             lblEstado.Text = "Mostrando " + filtrados.Count + " de " + todos.Count + " productos";
         }
-        private void Abrir(Form f)
+        private void Abrir(Func<Form> crear)
         {
-            using (f) f.ShowDialog(this);
-            if (!IsDisposed) ActualizarInventario(true);
+            try { using (var formulario = crear()) formulario.ShowDialog(this); }
+            catch (Exception ex) { Ui.Avisar(this, "No se pudo abrir la pantalla: " + ex.Message); }
+            finally { if (!IsDisposed) ActualizarInventario(true); }
         }
         private string CodigoSeleccionado() { return dgvInventario.CurrentRow == null ? null : Convert.ToString(dgvInventario.CurrentRow.Cells["Codigo"].Value); }
         private void btnEjemplo_Click(object sender, EventArgs e)
         {
             string mensaje;
             if (!DatosEjemplo.Cargar(out mensaje)) Ui.Avisar(this, mensaje);
-            ActualizarInventario(true); lblEstado.Text = "Ejemplo preparado · Stock inicial cero";
+            ActualizarInventario(true); lblEstado.Text = mensaje;
         }
         private void btnInicio_Click(object sender, EventArgs e) { cargando = true; txtBuscar.Clear(); cboFiltro.SelectedIndex = 0; cboPlataforma.SelectedItem = "Todas"; cboRetro.SelectedIndex = 0; cargando = false; ActualizarInventario(false); }
-        private void btnProductos_Click(object sender, EventArgs e) { txtBuscar.Focus(); }
-        private void btnAgregar_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarProductos")) Abrir(new frmProducto()); }
+        private void btnProductos_Click(object sender, EventArgs e)
+        {
+            if (!Ui.Permitir(this, "ConsultarProductos")) return;
+            var producto = TListaProducto.BuscarPorCodigo(CodigoSeleccionado());
+            bool soloConsulta = !TListaUsuario.TienePermiso("GestionarProductos");
+            if (producto == null)
+            {
+                if (soloConsulta) { Ui.Avisar(this, "Selecciona un producto para consultar su ficha."); return; }
+                Abrir(() => new frmProducto());
+            }
+            else Abrir(() => new frmProducto(producto, soloConsulta));
+        }
+        private void btnAgregar_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarProductos")) Abrir(() => new frmProducto()); }
         private void btnEditar_Click(object sender, EventArgs e)
         {
             if (!Ui.Permitir(this, "GestionarProductos")) return;
             var producto = TListaProducto.BuscarPorCodigo(CodigoSeleccionado());
             if (producto == null) { Ui.Avisar(this, "Selecciona un producto de la tabla."); return; }
-            Abrir(new frmProducto(producto));
+            Abrir(() => new frmProducto(producto));
         }
         private void btnDesactivar_Click(object sender, EventArgs e)
         {
@@ -76,12 +88,12 @@ namespace ProyectoParcialPA.Formularios
             if (!Ui.Preguntar(this, "¿Desactivar el producto " + codigo + "? Su historial se conserva.")) return;
             string mensaje; if (!TListaProducto.DesactivarProducto(codigo, out mensaje)) Ui.Avisar(this, mensaje); ActualizarInventario(true);
         }
-        private void btnUsuarios_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarUsuarios")) Abrir(new frmUsuarios()); }
-        private void btnClientes_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarClientes")) Abrir(new frmClientes()); }
-        private void btnProveedores_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "ConsultarProveedores")) Abrir(new frmProveedores()); }
-        private void btnCompras_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "RegistrarCompra")) Abrir(new frmCompra()); }
-        private void btnVentas_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "RegistrarVenta")) Abrir(new frmVenta()); }
-        private void btnReportes_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "ConsultarReportes")) Abrir(new frmReportes()); }
+        private void btnUsuarios_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarUsuarios")) Abrir(() => new frmUsuarios()); }
+        private void btnClientes_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "GestionarClientes")) Abrir(() => new frmClientes()); }
+        private void btnProveedores_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "ConsultarProveedores")) Abrir(() => new frmProveedores()); }
+        private void btnCompras_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "RegistrarCompra")) Abrir(() => new frmCompra()); }
+        private void btnVentas_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "RegistrarVenta")) Abrir(() => new frmVenta()); }
+        private void btnReportes_Click(object sender, EventArgs e) { if (Ui.Permitir(this, "ConsultarReportes")) Abrir(() => new frmReportes()); }
         private void btnCerrarSesion_Click(object sender, EventArgs e) { CambioUsuario = true; TListaUsuario.CerrarSesion(); Close(); }
         private void txtBuscar_TextChanged(object sender, EventArgs e) { if (!cargando && IsHandleCreated) ActualizarInventario(false); }
         private void cboFiltro_SelectedIndexChanged(object sender, EventArgs e) { if (!cargando && IsHandleCreated) ActualizarInventario(false); }

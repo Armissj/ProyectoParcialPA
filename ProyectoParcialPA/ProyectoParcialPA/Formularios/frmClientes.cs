@@ -19,7 +19,7 @@ namespace ProyectoParcialPA.Formularios
                 bool gestionar = TListaUsuario.TienePermiso("GestionarClientes");
                 btnGuardar.Enabled = gestionar; btnNuevo.Enabled = gestionar; btnDesactivar.Enabled = gestionar; chkActivo.Enabled = gestionar;
                 txtNombre.ReadOnly = !gestionar; txtApellido.ReadOnly = !gestionar; txtDireccion.ReadOnly = !gestionar; txtTelefono.ReadOnly = !gestionar; txtEmail.ReadOnly = !gestionar;
-                CargarListado(); Nuevo();
+                CargarListado(); Nuevo(); lblSubtitulo.Text = "Ejemplos cargados. Nuevo prepara una ficha editable; Guardar confirma los cambios.";
             });
         }
         private void CargarListado()
@@ -28,7 +28,12 @@ namespace ProyectoParcialPA.Formularios
             Ui.Tabla(dgvClientes, TListaCliente.BuscarPorNombre(txtBuscar.Text).Select(x => new { Id = x.Id, Nombre = x.Nombre, Apellido = x.Apellido, Direccion = x.Direccion, Telefono = x.Telefono, Email = x.Email, Activo = x.Activo }).ToList());
             dgvClientes.ClearSelection(); dgvClientes.CurrentCell = null; cargando = false;
         }
-        private void Nuevo() { cargando = true; dgvClientes.ClearSelection(); dgvClientes.CurrentCell = null; idActual = 0; chkActivo.Enabled = false; txtNombre.Clear(); txtApellido.Clear(); txtDireccion.Clear(); txtTelefono.Clear(); txtEmail.Clear(); chkActivo.Checked = true; txtNombre.Focus(); cargando = false; }
+        private void Nuevo()
+        {
+            cargando = true; dgvClientes.ClearSelection(); dgvClientes.CurrentCell = null; idActual = 0; chkActivo.Enabled = false;
+            var ejemplo = EjemplosFormulario.Cliente(); txtNombre.Text = ejemplo.Nombre; txtApellido.Text = ejemplo.Apellido; txtDireccion.Text = ejemplo.Direccion; txtTelefono.Text = ejemplo.Telefono; txtEmail.Text = ejemplo.Email;
+            chkActivo.Checked = true; txtNombre.Focus(); cargando = false;
+        }
         internal bool GuardarActual(out string mensaje)
         {
             var registro = new Cliente

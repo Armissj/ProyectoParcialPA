@@ -213,4 +213,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Formularios\EjemplosFormulario.cs" />
+  </ItemGroup>
 </Project>

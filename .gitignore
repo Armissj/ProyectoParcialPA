@@ -405,3 +405,5 @@ FodyWeavers.xsd
 # Ejecutable de respaldo incluido únicamente en la entrega.
 /ProyectoParcialPA/ProyectoParcialPA/ProyectoParcialPA.exe
 /ProyectoParcialPA/ProyectoParcialPA/ProyectoParcialPA.exe.config
+Documentacion/GUION_EXPOSICION.md
+Documentacion/GUIA_DEMO.md
