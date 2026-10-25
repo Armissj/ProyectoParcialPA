@@ -94,6 +94,8 @@
     <Compile Include="Entidades\PerifericoPS5.cs" />
     <Compile Include="Entidades\PerifericoSwitch.cs" />
     <Compile Include="Entidades\ProductoGaming.cs" />
+    <Compile Include="Controladores\TListaProducto.cs" />
+    <Compile Include="Entidades\ResumenInventario.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
