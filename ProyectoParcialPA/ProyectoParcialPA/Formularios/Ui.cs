@@ -42,6 +42,7 @@ namespace ProyectoParcialPA.Formularios
         }
         internal static void Tabla(DataGridView tabla, object datos)
         {
+            tabla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             tabla.DataSource = datos;
             foreach (DataGridViewColumn c in tabla.Columns)
             {
@@ -61,6 +62,8 @@ namespace ProyectoParcialPA.Formularios
                 if (c.Name == "Cantidad" || c.Name == "Stock") c.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
                 if (c.Name == "Fecha") c.DefaultCellStyle.Format = "dd/MM/yyyy HH:mm";
             }
+            tabla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tabla.PerformLayout();
         }
         internal static void Combo(ComboBox control, object datos, string texto, string valor)
         {
