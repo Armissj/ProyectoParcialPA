@@ -56,6 +56,11 @@
     <Compile Include="Entidades\Producto.cs" />
     <Compile Include="Entidades\PerifericoPC.cs" />
     <Compile Include="Entidades\Teclado.cs" />
+    <Compile Include="Entidades\RolUsuario.cs" />
+    <Compile Include="Entidades\Usuario.cs" />
+    <Compile Include="Utilidades\SeguridadPassword.cs" />
+    <Compile Include="Sesiones\SesionActual.cs" />
+    <Compile Include="Controladores\TListaUsuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -81,3 +86,5 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
+
+

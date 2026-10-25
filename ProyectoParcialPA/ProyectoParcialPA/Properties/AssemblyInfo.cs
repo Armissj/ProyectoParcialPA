@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 // para los componentes COM.  Si es necesario obtener acceso a un tipo en este ensamblado desde 
 // COM, establezca el atributo ComVisible en true en este tipo.
 [assembly: ComVisible(false)]
+[assembly: InternalsVisibleTo("ProyectoParcialPA.Tests")]
 
 // El siguiente GUID sirve como id. de typelib si este proyecto se expone a COM.
 [assembly: Guid("e789a2e9-2653-4ac6-a27f-8a002a87698f")]

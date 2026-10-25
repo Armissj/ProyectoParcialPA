@@ -2,7 +2,15 @@
 
 **Revisión:** 24 de octubre de 2026.
 
-Las clases, pruebas y automatización descritas están planificadas. Este documento no afirma que el código se haya implementado ni que las pruebas ya hayan pasado.
+Este documento refleja el estado real del proyecto y distingue claramente lo que ya quedó implementado de lo que sigue planificado para etapas posteriores.
+
+Estado de avance (etapa 1C):
+- La capa de usuarios, roles y sesión ya quedó implementada con listas en memoria para .NET Framework 4.7.2.
+- Los permisos se validan en el controlador y se consulta la sesión autenticada actual.
+- Se reforzó la seguridad de credenciales con PBKDF2-HMAC-SHA256, salt aleatorio y protección de referencias internas.
+- Se corrigió el flujo de sesión para que solo acepte usuarios registrados y vigentes, y para que el cierre de sesión y la desactivación no dejen estados inconsistentes.
+- La suite actual de usuarios y sesión quedó validada: 22 pruebas superadas en MSTest sobre net472, incluyendo regresiones de permisos, duplicados, contraseña nula/vacía y proveedor.
+- Esta entrega queda pendiente de revisión y commit; la etapa 1C no incluye formularios ni el resto del negocio.
 
 ## 1. Confirmación del alcance
 
@@ -20,14 +28,16 @@ La idea central es desarrollar una aplicación de escritorio en C# con Windows F
 
 ## 2. Estado actual del repositorio
 
-El proyecto actual ya existe en la solución y tiene una estructura mínima de Windows Forms, pero actualmente:
+El proyecto ya está organizado como una solución funcional para esta etapa y refleja el estado real del trabajo realizado:
 
-- El proyecto principal no está organizado por capas.
-- Tiene una clase base `Form1` sin lógica.
-- El archivo del proyecto apunta a .NET Framework 4.8.
-- No hay infraestructura de entidades, controladores, formularios ni pruebas.
+- La solución existente `ProyectoParcialPA.slnx` está en la raíz del repositorio.
+- El proyecto principal está en .NET Framework 4.7.2 y ya no queda pendiente el ajuste de framework para la base de negocio.
+- La estructura del dominio ya incluye clases de Entidades, Controladores, Sesiones y Utilidades para usuario, rol y autenticación.
+- El proyecto separado `ProyectoParcialPA.Tests` ya existe con MSTest para net472 y referencia al proyecto principal.
+- Se implementó la etapa 1C con pruebas reales de autenticación, permisos, duplicados, contraseñas y sesión.
+- El repositorio aún no incluye formularios ni la lógica de inventario, compras y ventas; esos módulos siguen planificados para las siguientes etapas.
 
-Por tanto, la primera etapa del plan deberá ajustar el objetivo del proyecto a .NET Framework 4.7.2, sin cambiar el código de negocio aún, y dejar listo el arranque para empezar a implementar la arquitectura solicitada.
+La base del proyecto quedó preparada y validada; la implementación restante se sigue por etapas, manteniendo la regla de empezar por pruebas y luego la lógica funcional.
 
 ## 3. Objetivo de tecnología
 
@@ -38,11 +48,11 @@ Por tanto, la primera etapa del plan deberá ajustar el objetivo del proyecto a 
 - Persistencia: listas en memoria
 - Pruebas: proyecto separado `ProyectoParcialPA.Tests` con MSTest para .NET Framework 4.7.2
 
-Nota de ajuste planificado:
+Nota de ajuste aplicado:
 
-- El proyecto actual está en .NET Framework 4.8.
-- En la primera etapa se debe planificar y ajustar el objetivo a 4.7.2 antes de comenzar la implementación de clases y formularios.
-- Este cambio no se realizará en esta tarea; solo se deja formalizado en el plan técnico.
+- El proyecto actual quedó ajustado a .NET Framework 4.7.2 en la etapa 1A y este objetivo ya está implementado en la solución actual.
+- La base de la arquitectura y de las pruebas ya se validó con la suite de usuarios y sesión.
+- El cambio de framework ya no está pendiente ni en el código ni en el plan operativo; lo que sigue pendiente es la ampliación del dominio a productos, clientes, proveedores, compras, ventas e interfaces.
 
 ## 4. Estructura del repositorio propuesta
 
@@ -856,37 +866,36 @@ Las pruebas de Producto usarán Teclado como clase concreta. La unicidad global 
 
 ## 13. GitHub Actions para compilación y pruebas
 
-El workflow .github/workflows/ci.yml se incorporará cuando el primer conjunto de pruebas reales esté implementado, antes de los formularios.
+El workflow ya quedó creado en `.github/workflows/ci.yml` y se valida con la solución real `ProyectoParcialPA.slnx` junto con el proyecto de pruebas `ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj`.
 
 ### 13.1 Eventos y entorno
 
-- Eventos push y pull_request.
-- Runner windows-latest.
-- Preparar MSBuild de Visual Studio 17.12 o posterior, compatible con .slnx.
-- Preparar un SDK .NET estable para el proyecto de pruebas SDK y VSTest. El SDK es una herramienta; la aplicación y las pruebas siguen apuntando a .NET Framework 4.7.2.
-- Comprobar que están disponibles las reference assemblies de .NET Framework 4.7.2; preparar el targeting pack o las reference assemblies oficiales si faltan.
-- Usar Microsoft.NET.Test.Sdk, MSTest.TestFramework y MSTest.TestAdapter con versiones compatibles fijadas.
+- Eventos: `push` y `pull_request` hacia `main`.
+- Runner: `windows-latest`.
+- Preparación: MSBuild del entorno de Visual Studio y SDK .NET compatible.
+- La aplicación y las pruebas siguen apuntando a .NET Framework 4.7.2; el SDK se usa únicamente para restaurar y ejecutar VSTest.
+- Se conservan los TRX como artefactos y el workflow falla si hay errores de compilación, si no ejecuta pruebas o si alguna prueba falla.
 
-### 13.2 Comandos planificados
+### 13.2 Comandos reales usados
 
-Ejecutar desde la raíz del repositorio, usando Debug al compilar y al ejecutar las pruebas:
+Ejecutar desde la raíz del repositorio usando Debug tanto en compilación como en pruebas:
 
 ```powershell
-msbuild "ProyectoParcialPA.slnx" /t:Restore /p:RestorePackagesConfig=true
-msbuild "ProyectoParcialPA.slnx" /t:Build /p:Configuration=Debug
-dotnet test "ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj" --configuration Debug --no-build --no-restore --logger "trx;LogFileName=test-results.trx" --results-directory "TestResults"
+dotnet restore "ProyectoParcialPA.slnx"
+dotnet build "ProyectoParcialPA.slnx" -c Debug
+dotnet test "ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj" -c Debug --logger "trx;LogFileName=RAYAO-UsuarioTests.trx" --results-directory "TestResults"
 ```
 
-MSBuild restaura y compila la solución existente. dotnet test ejecuta las pruebas ya compiladas con VSTest. Si las rutas reales cambian, se actualizan tanto en el plan como en el workflow.
+En GitHub Actions, el flujo sigue la misma idea con `dotnet restore`, `dotnet build` y `dotnet test` sobre la solución y el proyecto de pruebas. Se toman los resultados TRX y se publican como artefacto, incluso cuando hay error.
 
 ### 13.3 Validación del workflow
 
-- Los fallos de restauración, compilación o pruebas hacen fallar el job.
-- Comprobar que se descubre y ejecuta más de cero pruebas.
-- Conservar los resultados TRX como evidencia, también cuando falle una prueba.
-- Revisar el resultado de CI antes de integrar una PR de implementación a main.
+- La compilación y las pruebas son obligatorias para aceptar el job.
+- Si no se ejecuta ninguna prueba o si falla alguna, el job falla.
+- Se guardan los resultados TRX como evidencia operativa.
+- La validación local ya se realizó con la suite actual de usuarios y sesión.
 
-Estos comandos son el plan de ejecución y todavía no se han probado contra el sistema. Se comprobarán cuando existan el proyecto de pruebas y sus primeros casos.
+El workflow queda implementado y validado para la base ya construida; lo que sigue es ampliarlo con nuevas pruebas de productos, compras, ventas y formularios en las siguientes etapas.
 
 ## 14. Etapas de implementación
 
@@ -1038,16 +1047,16 @@ La primera etapa no debe partir desde un formulario, sino desde la base de negoc
 ## 18. Resumen ejecutivo
 
 - Objetivo: implementar RAYAO* 0.2 con C#, Windows Forms y .NET Framework 4.7.2.
-- Proyecto actual: arranque incompleto en .NET 4.8, lo que hay que ajustar en la primera etapa.
-- Arquitectura: Entidades, Controladores, Formularios.
-- Seguridad: PBKDF2, salt aleatorio por usuario, `PasswordHash`, `PasswordSalt` e `PasswordIterations`.
-- Inventario: activo/inactivo y stock solo cambia al confirmar.
+- Estado real: la primera etapa quedó concluida en la base de negocio y pruebas, con la solución actual ya apuntando a .NET 4.7.2.
+- Arquitectura: Entidades, Controladores, Sesiones, Utilidades y proyecto separado de pruebas.
+- Seguridad: PBKDF2-HMAC-SHA256, salt aleatorio por usuario, `PasswordHash`, `PasswordSalt` y `PasswordIterations`.
+- Inventario: activo/inactivo y stock solo cambia al confirmar operaciones sobre el dominio que corresponda.
 - Historial: detalles con copia del código, nombre, cantidad y costo/precio originales.
-- Permisos: el vendedor puede administrar clientes, consultar proveedores y registrar compras; las comprobaciones se hacen en los controladores.
-- Pruebas: proyecto separado `ProyectoParcialPA.Tests` con MSTest y referencia al proyecto principal.
-- CI/CD: workflow de GitHub Actions para Windows, build y tests.
+- Permisos: el vendedor puede administrar clientes, consultar proveedores y registrar compras; las comprobaciones se hacen en los controladores y siguen la matriz exacta de la especificación.
+- Pruebas: proyecto separado `ProyectoParcialPA.Tests` con MSTest y referencia al proyecto principal, con validación de usuarios y sesión ya funcionando.
+- CI/CD: workflow de GitHub Actions para Windows, build y tests ya creado y validado con la suite actual.
 
-La secuencia de trabajo será preparar el entorno, definir pruebas e implementar las reglas, incorporar CI con las primeras pruebas reales y después integrar formularios. El diseño visual se preparará con el estilo de RAYAO* cuando estén definidas las pantallas.
+La secuencia de trabajo continuada es avanzar a productos, clientes, proveedores, compras, ventas e integración con formularios, manteniendo la metodología de escribir pruebas antes de la lógica funcional, y dejando el paso actual ya ejecutado y verificado.
 
 ## 19. Referencias técnicas de apoyo
 
