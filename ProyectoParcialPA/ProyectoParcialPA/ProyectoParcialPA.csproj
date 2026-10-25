@@ -80,11 +80,23 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Entidades\Mouse.cs" />
+    <Compile Include="Entidades\MonitorPC.cs" />
+    <Compile Include="Entidades\ComponentePC.cs" />
+    <Compile Include="Entidades\Procesador.cs" />
+    <Compile Include="Entidades\MemoriaRAM.cs" />
+    <Compile Include="Entidades\TarjetaGrafica.cs" />
+    <Compile Include="Entidades\EquipoMusical.cs" />
+    <Compile Include="Entidades\Microfono.cs" />
+    <Compile Include="Entidades\InterfazAudio.cs" />
+    <Compile Include="Entidades\Vinilo.cs" />
+    <Compile Include="Entidades\PerifericoConsola.cs" />
+    <Compile Include="Entidades\PerifericoPS5.cs" />
+    <Compile Include="Entidades\PerifericoSwitch.cs" />
+    <Compile Include="Entidades\ProductoGaming.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
-
-
