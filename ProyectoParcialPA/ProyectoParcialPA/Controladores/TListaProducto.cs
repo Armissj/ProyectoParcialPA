@@ -1,14 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using ProyectoParcialPA.Entidades;
 
 namespace ProyectoParcialPA.Controladores
 {
     public static class TListaProducto
     {
-        private static readonly object LockObject = new object();
+        private static readonly object LockObject = EstadoTienda.Sincronizacion;
         private static List<Producto> _productos;
         private static readonly HashSet<string> ProductosConMovimientos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -93,91 +92,12 @@ namespace ProyectoParcialPA.Controladores
 
         private static Producto ClonarProducto(Producto producto)
         {
-            if (producto == null)
-            {
-                return null;
-            }
-
-            var clone = Activator.CreateInstance(producto.GetType());
-            if (clone == null)
-            {
-                return null;
-            }
-
-            var tipoActual = producto.GetType();
-            while (tipoActual != null && tipoActual != typeof(object))
-            {
-                foreach (var campo in tipoActual.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly))
-                {
-                    campo.SetValue(clone, campo.GetValue(producto));
-                }
-
-                tipoActual = tipoActual.BaseType;
-            }
-
-            return (Producto)clone;
-        }
-
-        private static void CopiarCampos(object origen, object destino)
-        {
-            if (origen == null || destino == null)
-            {
-                return;
-            }
-
-            var tipoOrigen = origen.GetType();
-            var tipoDestino = destino.GetType();
-            if (tipoOrigen != tipoDestino)
-            {
-                return;
-            }
-
-            foreach (var propiedad in tipoOrigen.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (!propiedad.CanWrite || propiedad.GetIndexParameters().Length > 0)
-                {
-                    continue;
-                }
-
-                if (propiedad.Name == "Stock" || propiedad.Name == "Activo")
-                {
-                    continue;
-                }
-
-                var propiedadDestino = tipoDestino.GetProperty(propiedad.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                if (propiedadDestino != null && propiedadDestino.CanWrite && propiedadDestino.PropertyType == propiedad.PropertyType)
-                {
-                    propiedadDestino.SetValue(destino, propiedad.GetValue(origen));
-                }
-            }
+            return producto == null ? null : producto.Copiar();
         }
 
         private static void EstablecerStock(Producto producto, int stock)
         {
-            if (producto == null)
-            {
-                return;
-            }
-
-            var campoStock = typeof(Producto).GetField("_stock", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (campoStock != null)
-            {
-                campoStock.SetValue(producto, stock);
-            }
-        }
-
-        private static void EstablecerActivo(Producto producto, bool activo)
-        {
-            if (producto == null)
-            {
-                return;
-            }
-
-            var campoActivo = typeof(Producto).GetField("_activo", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (campoActivo != null)
-            {
-                campoActivo.SetValue(producto, activo);
-            }
+            producto.EstablecerStockInterno(stock);
         }
 
         private static IEnumerable<string> ObtenerTiposProducto(Producto producto)
@@ -196,6 +116,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static List<Producto> ObtenerTodos()
         {
+            if (!TienePermisoConsultar()) { return new List<Producto>(); }
+
             lock (LockObject)
             {
                 InicializarSiNecesario();
@@ -205,6 +127,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static List<Producto> ObtenerTodosInactivos()
         {
+            if (!TienePermisoConsultar()) { return new List<Producto>(); }
+
             lock (LockObject)
             {
                 InicializarSiNecesario();
@@ -214,6 +138,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static Producto BuscarPorCodigo(string codigo)
         {
+            if (!TienePermisoConsultar()) { return null; }
+
             if (string.IsNullOrWhiteSpace(codigo))
             {
                 return null;
@@ -229,6 +155,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static List<Producto> BuscarPorNombreOParte(string texto)
         {
+            if (!TienePermisoConsultar()) { return new List<Producto>(); }
+
             if (string.IsNullOrWhiteSpace(texto))
             {
                 return ObtenerTodos();
@@ -256,6 +184,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static List<Producto> FiltrarPorTipo(string tipoProducto)
         {
+            if (!TienePermisoConsultar()) { return new List<Producto>(); }
+
             if (string.IsNullOrWhiteSpace(tipoProducto))
             {
                 return ObtenerTodos();
@@ -303,6 +233,7 @@ namespace ProyectoParcialPA.Controladores
                 copia.Codigo = NormalizarCodigo(copia.Codigo);
                 copia.Nombre = NormalizarTexto(copia.Nombre);
                 copia.Activo = true;
+                EstablecerStock(copia, 0);
 
                 var errores = copia.Validar();
                 if (errores.Any())
@@ -387,7 +318,7 @@ namespace ProyectoParcialPA.Controladores
                 copia.Codigo = NormalizarCodigo(original.Codigo);
                 copia.Activo = original.Activo;
                 EstablecerStock(copia, original.Stock);
-                CopiarCampos(copia, original);
+                _productos[_productos.IndexOf(original)] = copia;
                 mensaje = "Producto actualizado correctamente.";
                 return true;
             }
@@ -421,6 +352,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static bool ValidarStockDisponible(string codigo, int cantidadSolicitada)
         {
+            if (!TienePermisoConsultar()) { return false; }
+
             if (cantidadSolicitada <= 0)
             {
                 return false;
@@ -436,6 +369,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static decimal ObtenerValorInventarioVenta()
         {
+            if (!TienePermisoConsultar()) { return 0m; }
+
             lock (LockObject)
             {
                 InicializarSiNecesario();
@@ -445,6 +380,8 @@ namespace ProyectoParcialPA.Controladores
 
         public static ResumenInventario ObtenerResumenGeneral()
         {
+            if (!TienePermisoConsultar()) { return new ResumenInventario(); }
+
             lock (LockObject)
             {
                 InicializarSiNecesario();

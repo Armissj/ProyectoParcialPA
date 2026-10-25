@@ -1,3 +1,4 @@
-<Solution>
+﻿<Solution>
   <Project Path="ProyectoParcialPA/ProyectoParcialPA.csproj" Id="e789a2e9-2653-4ac6-a27f-8a002a87698f" />
+  <Project Path="ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj" Id="4d7b3ec7-e3c1-4ff0-8abc-30cc3f668259" />
 </Solution>

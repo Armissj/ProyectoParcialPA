@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ProyectoParcialPA.Entidades
@@ -74,6 +74,17 @@ namespace ProyectoParcialPA.Entidades
             }
 
             return texto.Trim();
+        }
+
+        internal Producto Copiar()
+        {
+            return (Producto)MemberwiseClone();
+        }
+
+        internal void EstablecerStockInterno(int valor)
+        {
+            if (valor < 0) throw new ArgumentOutOfRangeException("valor", "El stock no puede ser negativo.");
+            _stock = valor;
         }
 
         public virtual List<string> Validar()
