@@ -1,0 +1,97 @@
+name: RAYAO* CI
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: windows-latest
+
+    env:
+      SOLUTION_PATH: ProyectoParcialPA.slnx
+      TEST_PROJECT_PATH: ProyectoParcialPA/ProyectoParcialPA.Tests/ProyectoParcialPA.Tests.csproj
+      CONFIGURATION: Debug
+      TEST_RESULTS_DIR: TestResults
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore solution
+        shell: pwsh
+        run: |
+          msbuild "$env:SOLUTION_PATH" /t:Restore /p:Configuration=$env:CONFIGURATION /p:RestorePackagesConfig=true
+
+      - name: Build solution
+        shell: pwsh
+        run: |
+          msbuild "$env:SOLUTION_PATH" /t:Build /p:Configuration=$env:CONFIGURATION
+
+      - name: Run tests with VSTest
+        shell: pwsh
+        run: |
+          if (!(Test-Path "$env:TEST_PROJECT_PATH")) {
+            throw "No existe el proyecto de pruebas: $env:TEST_PROJECT_PATH"
+          }
+
+          $resultsDirectory = Join-Path $PWD "$env:TEST_RESULTS_DIR"
+          New-Item -ItemType Directory -Force -Path $resultsDirectory | Out-Null
+
+          dotnet test "$env:TEST_PROJECT_PATH" --configuration $env:CONFIGURATION --no-build --no-restore --logger "trx;LogFileName=rayao-tests.trx" --results-directory "$resultsDirectory" --verbosity minimal
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ne 0) {
+            throw "dotnet test falló con exit code $exitCode"
+          }
+
+          $trxFiles = Get-ChildItem -Path $resultsDirectory -Filter *.trx -Recurse
+          if ($trxFiles.Count -eq 0) {
+            throw "No se ejecutó ninguna prueba: no se generó ningún archivo TRX."
+          }
+
+          $executedTotal = 0
+          foreach ($trxFile in $trxFiles) {
+            $xml = [xml](Get-Content -Path $trxFile.FullName -Raw)
+            $counter = $xml.SelectSingleNode("//*[local-name()='ResultSummary']/*[local-name()='Counters']")
+            if ($null -eq $counter) {
+              throw "Falta ResultSummary/Counters en $($trxFile.FullName)."
+            }
+
+            $executedValue = $counter.GetAttribute("executed")
+            if ([string]::IsNullOrWhiteSpace($executedValue)) {
+              throw "Falta el atributo executed en ResultSummary/Counters del archivo $($trxFile.FullName)."
+            }
+
+            $executedTotal += [int]$executedValue
+          }
+
+          if ($executedTotal -eq 0) {
+            throw "El total de pruebas ejecutadas es 0."
+          }
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rayao-test-results
+          path: |
+            TestResults/**
+            **/*.trx
+          if-no-files-found: error
