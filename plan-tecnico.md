@@ -4,13 +4,14 @@
 
 Este documento refleja el estado real del proyecto y distingue claramente lo que ya quedó implementado de lo que sigue planificado para etapas posteriores.
 
-Estado de avance (etapa 1C):
-- La capa de usuarios, roles y sesión ya quedó implementada con listas en memoria para .NET Framework 4.7.2.
-- Los permisos se validan en el controlador y se consulta la sesión autenticada actual.
-- Se reforzó la seguridad de credenciales con PBKDF2-HMAC-SHA256, salt aleatorio y protección de referencias internas.
-- Se corrigió el flujo de sesión para que solo acepte usuarios registrados y vigentes, y para que el cierre de sesión y la desactivación no dejen estados inconsistentes.
-- La suite actual de usuarios y sesión quedó validada: 22 pruebas superadas en MSTest sobre net472, incluyendo regresiones de permisos, duplicados, contraseña nula/vacía y proveedor.
-- Esta entrega queda pendiente de revisión y commit; la etapa 1C no incluye formularios ni el resto del negocio.
+Estado de avance (etapa 2A):
+- La etapa 1C de usuarios, roles y sesión quedó integrada y validada con pruebas MSTest sobre .NET Framework 4.7.2.
+- La etapa 2A de productos quedó implementada con la jerarquía completa del dominio: PerifericoPC, ComponentePC, EquipoMusical, PerifericoConsola, Vinilo y ProductoGaming, siguiendo la metodología de atributos privados, constructores, propiedades y validaciones heredadas.
+- La familia de entidades mantiene el patrón base de Producto: stock inicial en cero, activo en true, código normalizado y validación de textos y precios con reglas consistentes en la base y en cada subclase.
+- Se agregaron pruebas reales para validar la herencia, los campos obligatorios, el precio, los valores numéricos y los productos nuevos en la suite de MSTest del proyecto separado.
+- Se documentan y aplican reglas específicas de validación adicionales: `TipoArticulo` en `ProductoGaming` solo acepta `Consola`, `Videojuego` o `Accesorio` en cualquier combinación de mayúsculas y espacios; `InterfazAudio` exige que al menos una de las dos cantidades sea mayor que cero y que ninguna sea negativa; `Vinilo` valida que el año esté en el rango 1900 al año actual más uno.
+- La suite actual de productos quedó validada: 28 pruebas superadas en MSTest sobre net472, sin fallos ni pruebas omitidas.
+- La etapa 2A queda pendiente de revisión y commit; la lógica de TListaProducto, formularios y módulos siguientes se mantienen para etapas posteriores.
 
 ## 1. Confirmación del alcance
 
