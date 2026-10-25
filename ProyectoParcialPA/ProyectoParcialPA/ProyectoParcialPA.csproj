@@ -104,4 +104,11 @@
   <ItemGroup>
     <Compile Include="Controladores\EstadoTienda.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controladores\TListaCliente.cs" />
+    <Compile Include="Controladores\TListaProveedor.cs" />
+    <Compile Include="Entidades\Cliente.cs" />
+    <Compile Include="Entidades\Proveedor.cs" />
+    <Compile Include="Utilidades\ReglasDatos.cs" />
+  </ItemGroup>
 </Project>
